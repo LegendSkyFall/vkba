@@ -22,7 +22,15 @@ class DB extends PDO{
         ];
         parent::_construct('mysql_host=' . MYSQL_HOST . ';dbname=' . MYSQL_DB . ';charset=utf8', MYSQL_USER, MYSQL_PASS, $options);
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      if(DEBUG){
+        echo $e->getMessage() . "<br>";
+      }
+      exit("Internal server error. Could not connect to specified database.");
     }
   }
 }
+
+# create instance
+$db = new DB();
 ?>
