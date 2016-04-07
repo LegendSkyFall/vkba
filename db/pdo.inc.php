@@ -11,4 +11,16 @@ only for testing purposes,
 can contain sensible data
 */
 define('DEBUG', true);
+
+# db class
+class DB extends PDO{
+  public function __construct(){
+    try{
+      $options = [
+          PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ];
+    }
+  }
+}
 ?>
