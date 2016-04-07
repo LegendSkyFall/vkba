@@ -22,6 +22,7 @@ class DB extends PDO{
         ];
         parent::_construct('mysql_host=' . MYSQL_HOST . ';dbname=' . MYSQL_DB . ';charset=utf8', MYSQL_USER, MYSQL_PASS, $options);
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $this->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     }catch(Exception $e){
       if(DEBUG){
         echo $e->getMessage() . "<br>";
