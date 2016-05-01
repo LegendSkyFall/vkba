@@ -87,6 +87,25 @@
             </div><!-- sm-st clearfix -->
           </div><!-- col-md-3 -->
         </div><!-- row -->
+        <!-- user Account type -->
+        <div class="col-md-3">
+          <div class="sm-st clearfix">
+            <span class="sm-st-icon st-green"><i class="fa fa-credit-card"></i></span>
+            <div class="sm-st-info">
+              <span>
+                <?php
+                if($getAccountType == 0){
+                  echo "Girokonto";
+                }elseif($getAccountType == 1){
+                  echo "Händlerkonto";
+                }
+                ?>
+              </span>
+              QuickPoints
+            </div><!-- sm-st-info -->
+          </div><!-- sm-st clearfix -->
+        </div><!-- col-md-3 -->
+      </div><!-- row -->
       </section>
     </aside>
   </body>
