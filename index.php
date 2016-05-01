@@ -72,6 +72,20 @@
               </div><!-- sm-st-info -->
             </div><!-- sm-st clearfix -->
           </div><!-- col-md-3 -->
+          <!-- user QuickPoints -->
+          <div class="col-md-3">
+            <div class="sm-st clearfix">
+              <span class="sm-st-icon st-violet"><i class="fa fa-money"></i></span>
+              <div class="sm-st-info">
+                <span>
+                  <?php
+                  echo $getQuickPoints;
+                  ?>
+                </span>
+                QuickPoints
+              </div><!-- sm-st-info -->
+            </div><!-- sm-st clearfix -->
+          </div><!-- col-md-3 -->
         </div><!-- row -->
       </section>
     </aside>
