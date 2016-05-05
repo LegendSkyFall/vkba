@@ -106,7 +106,21 @@
           </div><!-- sm-st clearfix -->
         </div><!-- col-md-3 -->
       </div><!-- row user tiles -->
-      </section>
+      <!-- main content row -->
+      <div class="row">
+        <div class="col-md-8">
+          <!-- balance history chart -->
+          <section class="panel">
+            <header class="panel-heading">
+              Kontostandsverlauf
+            </header>
+            <div class="panel-body">
+              <canvas id="balanceChart" width="600" height="330"></canvas>
+            </div>
+          </section><!-- panel balance chart -->
+        </div><!-- col-md-8 -->
+      </div><!-- main content row -->
+    </section><!-- content -->
     </aside>
   </body>
 </html>
