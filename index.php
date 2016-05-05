@@ -43,6 +43,7 @@
         <?php
         include('include/accountInformation.php');
         ?>
+        <!-- user tiles -->
         <div class="row" style="margin-bottom: 5px">
           <!-- user balance -->
           <div class="col-md-3">
@@ -86,7 +87,6 @@
               </div><!-- sm-st-info -->
             </div><!-- sm-st clearfix -->
           </div><!-- col-md-3 -->
-        </div><!-- row -->
         <!-- user Account type -->
         <div class="col-md-3">
           <div class="sm-st clearfix">
@@ -105,7 +105,7 @@
             </div><!-- sm-st-info -->
           </div><!-- sm-st clearfix -->
         </div><!-- col-md-3 -->
-      </div><!-- row -->
+      </div><!-- row user tiles -->
       </section>
     </aside>
   </body>
