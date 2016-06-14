@@ -3,6 +3,16 @@
 session_start();
 # conntect to database
 require("db/pdo.inc.php");
+
+# get user information
+$getUserInformation = $db->prepare("SELECT a_type, balance, qp FROM Accounts WHERE username=:username");
+$getUserInformation->bindValue(":username", $_SESSION['user'], PDO::PARAM_STR);
+$getUserInformation->execute();
+foreach($getUserInformation as $userInformation){
+  $accountType = $userInformation['a_type'];
+  $userBalance = $userInformation['balance'];
+  $quickPoints = $userInformation['qp'];
+}
 ?>
 <html>
   <?php
@@ -58,7 +68,7 @@ require("db/pdo.inc.php");
               <div class="sm-st-info">
                 <span>
                   <?php
-                  echo $getUserBalance;
+                  echo $userBalance;
                   ?>
                 </span>
                 Kontostand in Kadis
@@ -72,7 +82,7 @@ require("db/pdo.inc.php");
               <div class="sm-st-info">
                 <span>
                   <?php
-                  echo $getNumTransactions;
+                  echo $numTransacions;
                   ?>
                 </span>
                 Anzahl der Transaktionen
@@ -86,7 +96,7 @@ require("db/pdo.inc.php");
               <div class="sm-st-info">
                 <span>
                   <?php
-                  echo $getQuickPoints;
+                  echo $quickPoints;
                   ?>
                 </span>
                 QuickPoints
@@ -100,9 +110,9 @@ require("db/pdo.inc.php");
             <div class="sm-st-info">
               <span>
                 <?php
-                if($getAccountType == 0){
+                if($accountType == 0){
                   echo "Girokonto";
-                }elseif($getAccountType == 1){
+                }elseif($accountType == 1){
                   echo "Händlerkonto";
                 }
                 ?>
