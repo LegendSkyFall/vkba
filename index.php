@@ -13,6 +13,13 @@ foreach($getUserInformation as $userInformation){
   $userBalance = $userInformation['balance'];
   $quickPoints = $userInformation['qp'];
 }
+
+# get total number of transactions
+$getTransactions = $db->prepare("SELECT t_id FROM Transactions WHERE t_adress=:userAdress OR t_sender=:userSender");
+$getTransactions->bindValue('userAdress', $_SESSION['user'], PDO::PARAM_STR);
+$getTransactions->bindValue('userSender', $_SESSION['user'], PDO::PARAM_STR);
+$getTransactions->execute();
+$numTransactions = $numTransactions->rowCount();
 ?>
 <html>
   <?php
@@ -82,7 +89,7 @@ foreach($getUserInformation as $userInformation){
               <div class="sm-st-info">
                 <span>
                   <?php
-                  echo $numTransacions;
+                  echo $numTransactions;
                   ?>
                 </span>
                 Anzahl der Transaktionen
