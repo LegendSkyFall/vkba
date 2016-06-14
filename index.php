@@ -1,3 +1,9 @@
+<?php
+# start session
+session_start();
+# conntect to database
+require("db/pdo.inc.php");
+?>
 <html>
   <?php
   include('include/head.php');
@@ -101,7 +107,7 @@
                 }
                 ?>
               </span>
-              QuickPoints
+              Kontotyp
             </div><!-- sm-st-info -->
           </div><!-- sm-st clearfix -->
         </div><!-- col-md-3 -->
