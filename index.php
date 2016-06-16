@@ -19,7 +19,7 @@ $getTransactions = $db->prepare("SELECT t_id FROM Transactions WHERE t_adress=:u
 $getTransactions->bindValue('userAdress', $_SESSION['user'], PDO::PARAM_STR);
 $getTransactions->bindValue('userSender', $_SESSION['user'], PDO::PARAM_STR);
 $getTransactions->execute();
-$numTransactions = $numTransactions->rowCount();
+$numTransactions = $getTransactions->rowCount();
 ?>
 <html>
   <?php
@@ -63,9 +63,6 @@ $numTransactions = $numTransactions->rowCount();
         <div id="alert alert-warning" style="text-align: center; font-weight: bold">
           VKBA befindet sich derzeit noch in der First-Access-Phase. Fehler könnten noch auftreten!
         </div>
-        <?php
-        include('include/accountInformation.php');
-        ?>
         <!-- user tiles -->
         <div class="row" style="margin-bottom: 5px">
           <!-- user balance -->
