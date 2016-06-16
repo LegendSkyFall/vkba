@@ -11,8 +11,6 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
   <!-- Morris chart -->
   <link href="style/morris/morris.css" rel="stylesheet" type="text/css" />
-  <!-- iCheck for checkboxes and radio inputs -->
-  <link href="style/iCheck/all.css" rel="stylesheet" type="text/css" />
   <!-- Lato font CDN -->
   <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
   <!-- theme style -->
