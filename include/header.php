@@ -65,7 +65,7 @@
     </nav><!-- end navbar navbar-static-top -->
 </header>
 
-<!-- Modal -->
+<!-- Modal AddOns-->
 <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -123,6 +123,21 @@
           Die wöchentlichen AddOn-Kosten werden - unabhängig vom Kaufdatum - immer sonntags automatisch abgebucht. AddOns können jederzeit wieder gekauft werden.
         </span>
       </div><!-- end modal-body -->
+    </div><!-- end modal-content -->
+  </div><!-- end modal-dialog -->
+</div><!-- end modal -->
+
+<!-- Modal Kontakte -->
+<div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+        <h4 class="modal-title">Kontakte</h4>
+      </div>
+      <div class="modal-body">
+        Kontakte werden in naher Zukunft freigeschaltet.
+      </div>
     </div><!-- end modal-content -->
   </div><!-- end modal-dialog -->
 </div><!-- end modal -->
