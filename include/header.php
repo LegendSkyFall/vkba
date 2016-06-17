@@ -64,3 +64,34 @@
       </div><!-- end navbar-right -->
     </nav><!-- end navbar navbar-static-top -->
 </header>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="moda-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x/button>
+        <h4 class="modal-title">Add-Ons</h4>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="">
+          <div class="col-md-12">
+            <div class="sm-st clearfix">
+              <?php
+              //TODO
+              ?>
+              <div class="sm-st-info">
+                <?php
+                //TODO
+                ?>
+                <button type="submit" name="deleteAddon" class="btn btn-default btn-sm pull-right">
+                  <span style="color: #DC2E31" class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+                <span>Werbe-AddOn</span>
+                Mit diesem AddOn bist Du berechtigt, Werbung beispielsweise für Deinen Warp auf Kadcon, oder aber auch für VKBA-Announcen zu schalten. Werbung erscheint zufällig bei QuickBuy.
+                <br>
+                <b>Kosten:</b> 50 Kadis/Woche
+              </div><!-- end sm-st-info -->
+            </div><!-- end sm-st clearfix -->
+          </div><!-- end col-md-12 -->
+        </form><!-- end form -->
