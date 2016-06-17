@@ -37,4 +37,23 @@
               <li class="footer"><a href="#">Alle Transaktionen einsehen</a></li>
             </ul><!-- end dropdown-menu -->
           </li><!-- end dropdown messages-menu -->
+          <!-- user account menu -->
+          <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-user"></i>
+              <span><?php echo $_SESSION['user']; ?><i class="caret"></i></span>
+            </a>
+            <ul class="dropdown-menu dropdown-custom dropdown-menu-right">
+              <li class="dropdown-header text-center">VKBA-Account</li>
+                <li>
+                  <a data-toggle="modal" href="#myModal2">
+                    <i class="fa fa-plus fa-fw pull-right"></i>
+                    <span class="badge badge-success pull-right">2</span> Add-Ons</a>
+                  <a data-toggle="modal" href="#myModal3">
+                    <i class="fa fa-users fa-fw pull-right"></i>
+                    <span class="badge badge-danger pull-right">0</span> Kontakte</a>
+                  </a>
+                </li>
+                <li class="divider"></li>
+
 </header>
