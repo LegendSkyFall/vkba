@@ -127,7 +127,7 @@
   </div><!-- end modal-dialog -->
 </div><!-- end modal -->
 
-<!-- Modal Kontakte -->
+<!-- Modal contacts -->
 <div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -138,6 +138,25 @@
       <div class="modal-body">
         Kontakte werden in naher Zukunft freigeschaltet.
       </div>
+    </div><!-- end modal-content -->
+  </div><!-- end modal-dialog -->
+</div><!-- end modal -->
+
+<!-- Modal VKBA settings -->
+<div class="modal fade" id="myModal4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+        <h4 class="modal-title">VKBA-Einstellungen</h4>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="">
+          <?php
+          //TODO
+          ?>
+        </form>
+      </div><!-- end modal-body -->
     </div><!-- end modal-content -->
   </div><!-- end modal-dialog -->
 </div><!-- end modal -->
