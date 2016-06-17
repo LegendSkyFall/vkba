@@ -45,15 +45,22 @@
             </a>
             <ul class="dropdown-menu dropdown-custom dropdown-menu-right">
               <li class="dropdown-header text-center">VKBA-Account</li>
-                <li>
-                  <a data-toggle="modal" href="#myModal2">
-                    <i class="fa fa-plus fa-fw pull-right"></i>
-                    <span class="badge badge-success pull-right">2</span> Add-Ons</a>
-                  <a data-toggle="modal" href="#myModal3">
-                    <i class="fa fa-users fa-fw pull-right"></i>
-                    <span class="badge badge-danger pull-right">0</span> Kontakte</a>
-                  </a>
-                </li>
-                <li class="divider"></li>
-
+              <li>
+                <a data-toggle="modal" href="#myModal2">
+                  <i class="fa fa-plus fa-fw pull-right"></i>
+                  <span class="badge badge-success pull-right">2</span> Add-Ons</a>
+                <a data-toggle="modal" href="#myModal3">
+                  <i class="fa fa-users fa-fw pull-right"></i>
+                  <span class="badge badge-danger pull-right">0</span> Kontakte</a>
+                </a>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <a href="logout/"><i class="fa fa-sign-out fa-fw pull-right"></i> Logout</a>
+              </li>
+            </ul>
+          </li><!-- end dropdown user user-menu -->
+        </ul><!-- end nav navbar-nav -->
+      </div><!-- end navbar-right -->
+    </nav><!-- end navbar navbar-static-top -->
 </header>
