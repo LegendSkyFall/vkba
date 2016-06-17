@@ -95,3 +95,34 @@
             </div><!-- end sm-st clearfix -->
           </div><!-- end col-md-12 -->
         </form><!-- end form -->
+        <form method="post" action="">
+          <div class="col-md-12">
+            <div class="sm-st clearfix">
+              <?php
+              //TODO
+              ?>
+              <div class="sm-st-info">
+                <?php
+                //TODO
+                ?>
+                <button type="submit" name="deleteAddon" class="btn btn-default btn-sm pull-right">
+                  <span style="color: #DC2E31" class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+                <span>Händler-AddOn</span>
+                Mit diesem AddOn bist Du berechtigt, eigene Inserate bei QuickBuy schalten zu können, auch wenn Du kein Händlerkonto besitzt.<b>AddOn nur für Girkonten verfügbar</b>
+                <br>
+                <b>Kosten:</b> 65 Kadis/Woche
+              </div><!-- end sm-st-info -->
+            </div><!-- end sm-st clearfix -->
+          </div><!-- end col-md-12 -->
+        </form><!-- end form -->
+        <br><br>
+        <span class="help-block">
+          AddOns können jederzeit gekündigt werden.
+          Um Missbrauch zu vermeiden, wird bei der Kündigung ein einmaliger Betrag in Höhe der wöchentlichen Kosten zuzüglich einer kleinen Gebühr in Rechnung gestellt.
+          Die wöchentlichen AddOn-Kosten werden - unabhängig vom Kaufdatum - immer sonntags automatisch abgebucht. AddOns können jederzeit wieder gekauft werden.
+        </span>
+      </div><!-- end modal-body -->
+    </div><!-- end modal-content -->
+  </div><!-- end modal-dialog -->
+</div><!-- end modal -->
