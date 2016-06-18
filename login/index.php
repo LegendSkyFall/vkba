@@ -1,3 +1,80 @@
+<?php
+# start session
+session_start();
+# require db connection
+require('../db/pdo.inc.php');
+
+if(isset($_POST['submit'])){
+  $error = false;
+  $postedPassword= $_POST['password'];
+
+  # check login credentials
+  $getAccountInfo = $db->prepare("SELECT username, pw_hash, salt, activated, a_type, ktn_nr FROM Accounts WHERE username=:username AND banned='0'");
+  $getAccountInfo->bindValue(':username', $_POST['username'], PDO::PARAM_STR);
+  $getAccountInfo->execute();
+  $accountExists = ($getAccountInfo->rowCount() > 0) ? true : false;
+
+  if($accountExists){
+    foreach($getAccountInfo as $accountInfo){
+      $getUsername = $accountInfo['username'];
+      $getPassword = $accountInfo['pw_hash'];
+      $getSaltKey = $accountInfo['salt'];
+      $getActivatedState = $accountInfo['activated'];
+      $getAType = $accountInfo['a_type'];
+      $getKtnNr = $accountInfo['ktn_nr'];
+    }
+  }else{
+    $error = true;
+  }
+
+  if(!$error){
+    # create hash
+    function mySHA512($postedPassword, $getSaltKey, $iterations){
+      for($x=0; $x<$iterations; $x++){
+        $postedPassword = hash('sha512', $postedPassword . $getSaltKey);
+      }
+      return $postedPassword;
+    }
+    $passwordHash = mySHA512($postedPassword, utf8_decode($getSaltKey), 10000);
+
+    if($getPassword != $passwordHash){
+      # wrong password
+      $error = true;
+    }
+
+    if($getActivatedState == 0){
+      # not verified
+      $error = true;
+  		$activatedMessage = "<div class='alert alert-danger' style='font-weight: bold; text-align: center'>Dein Account ist nicht verifiziert! Eine Anleitung gibt es <a href='http://tinyurl.com/vkba-verify'>hier</a>. Bitte anschließend <a href='http://vkba.legendskyfall.de/activation.php?access=browser'>hier</a> Deinen Account aktivieren</a>.";
+  	}
+
+  }
+
+  # if no error, try to login
+  if(!$error){
+    if(empty($_SESSION['user'])){
+      session_regenerate_id();
+      $_SESSION['user'] = $getUsername;
+      $_SESSION['csrf_token'] = uniqid('',true); # protection against CSRF
+			$_SESSION['ktn_nr'] = $getKtnNr;
+			$_SESSION['ktype'] = $getAType;
+      # login successfull
+			header("Location: ../");
+    }else{
+      # already logged in
+      header("Location: ../");
+    }
+  }else{
+      # login not successfull
+      if(!empty($activatedMessage)){
+        echo $activatedMessage;
+      }
+      $errormessage = "Zugangsdaten falsch oder Account nicht verifiziert (Anleitung gibt es <a href='http://tinyurl.com/vkba-verify'>hier</a>).Bitte erneut versuchen! Unter Umständen kann auch eine Sperrung des Accounts vorliegen.";
+	  	session_destroy();
+  }
+}
+?>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
