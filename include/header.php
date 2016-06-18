@@ -52,7 +52,6 @@
                 <a data-toggle="modal" href="#myModal3">
                   <i class="fa fa-users fa-fw pull-right"></i>
                   <span class="badge badge-danger pull-right">0</span> Kontakte</a>
-                </a>
               </li>
               <li class="divider"></li>
               <li>
