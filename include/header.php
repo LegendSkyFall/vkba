@@ -69,7 +69,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="moda-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x/button>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
         <h4 class="modal-title">Add-Ons</h4>
       </div>
       <div class="modal-body">
