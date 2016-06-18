@@ -17,8 +17,71 @@
       </div><!-- end user-panel -->
       <ul class="sidebar-menu">
         <?php
-        //TODO
+        // get active page for highlighting
+        switch(basename($_SERVER["REQUEST_URI"])){
+          case basename($_SERVER["REQUEST_URI"]) == "index.php" || basename($_SERVER["REQUEST_URI"]) == "":
+            $active = "index";
+            break;
+          case basename($_SERVER["REQUEST_URI"]) == "transactions.php":
+            $active = "transactions";
+            break;
+          case basename($_SERVER["REQUEST_URI"]) == "actions.php":
+            $active = "actions";
+            break;
+          case basename($_SERVER["REQUEST_URI"]) == "quickbuy.php":
+            $active = "quickbuy";
+            break;
+        }
         ?>
+        <?php
+        if($active == "index"){
+          echo "<li class='active'>";
+        }else{
+          echo "<li>";
+        }
+        ?>
+          <a href="index.php">
+            <i class="fa fa-eye"></i> <span>Übersicht</span>
+          </a>
+        </li>
+        <?php
+        if($active == "transactions"){
+          echo "<li class='active'>";
+        }else{
+          echo "<li>";
+        }
+        ?>
+          <a href="transactions.php">
+            <i class="fa fa-eye"></i> <span>Transaktionen</span>
+          </a>
+        </li>
+        <?php
+        if($active == "actions"){
+          echo "<li class='active'>";
+        }else{
+          echo "<li>";
+        }
+        ?>
+          <a href="actions.php">
+            <i class="fa fa-eye"></i> <span>Aktionen</span>
+          </a>
+        </li>
+        <?php
+        if($active == "quickbuy"){
+          echo "<li class='active'>";
+        }else{
+          echo "<li>";
+        }
+        ?>
+          <a href="quickbuy.php">
+            <i class="fa fa-eye"></i> <span>QuickBuy</span>
+          </a>
+        </li>
+        <li>
+          <a data-toggle="modal" href="#myModal">
+            <i class="fa fa-tasks"></i> <span>Systemstatus</span>
+          </a>
+        </li>
       </ul>
     </section><!-- end sidebar -->
   </aside><!-- end left-side sidebar-offcanvas -->
