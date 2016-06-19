@@ -1,3 +1,93 @@
+<?php
+# db access
+require('../db/pdo.inc.php');
+if(isset($_POST['submit'])){
+  $error = false;
+  $ktnNr = mt_rand(10000000, 99999999);
+  $skey = mt_rand(1000, 9999);
+  $akey = mt_rand(100000000, 999999999);
+  $username = $_POST['username'];
+  $postPassword = $_POST['password'];
+  $postPassword2 = $_POST['password2'];
+  $aType = $_POST['a_type'];
+  $balance = 100.00;
+
+  # validate password
+    if(strlen($postPassword) == 0) {
+      $errormessage = 'Bitte ein Passwort angeben.<br>';
+      $error = true;
+    }
+
+    if($postPassword != $postPassword2) {
+      $errormessage = 'Die Passwörter müssen übereinstimmen.<br>';
+      $error = true;
+    }
+
+    if(strlen($postPassword) < 6) {
+      $errormessage = 'Das Passwort muss aus mindestens 6 Zeichen bestehen.<br>';
+      $error = true;
+    }
+
+    # check ktnNr
+    if(!$error){
+      $checkKtnNr = $db->prepare("SELECT ktn_nr FROM Accounts WHERE ktn_nr=:ktnNr");
+      $checkKtnNr->bindValue(':ktnNr', $ktnNr, PDO::PARAM_INT);
+      $checkKtnNr->execute();
+      $ktnNrIsDouble = ($checkKtnNr->rowCount() > 0) ? true : false;
+
+      if($ktnNrIsDouble){
+        # ktnNr already exists, generation error, exit
+        $errormessage = 'Fehler im System aufgetreten. Bitte erneut versuchen!';
+        $error = true;
+      }
+    }
+
+    # username validation
+    if(!$error){
+      //TODO
+      # check username
+      $checkName = $db->prepare("SELECT username FROM Accounts WHERE username=:username");
+      $checkName->bindValue(':username', $username, PDO::PARAM_STR);
+      $checkName->execute();
+      $nameIsDouble = ($checkName->rowCount() > 0) ? true: false;
+      if($nameIsDouble){
+        # user already have an account, exit
+        $errormessage = "Es existiert bereits ein Acount unter diesem Spielernamen. Mehrere Accounts sind nicht erlaubt.";
+        $error = true;
+      }
+    }
+
+    # if no error, create account
+    if(!$error){
+      # generate password hash
+      function mySha512($postPassword, $salt, $iterations) {
+        for ($x=0; $x<$iterations; $x++) {
+          $postPassword = hash('sha512', $postPassword . $salt);
+        }
+        return $postPassword;
+      }
+      $salt = mcrypt_create_iv(22, MCRYPT_DEV_URANDOM);
+      $passwordHash = mySha512($postPassword, $salt, 10000);
+
+      # save account
+      $saveAccount = $db->prepare("INSERT INTO Accounts
+                                    (ktn_nr, username, pw_hash, salt, skey, akey, a_type, balance)
+                                    VALUES
+                                    (:ktnNr, :username, :hash, :salt, :skey, :akey, :atype, :balance)
+                                  ");
+      $saveAccount->bindValue(':ktnNr', $ktnNr, PDO::PARAM_INT);
+      $saveAccount->bindValue(':username', $username, PDO::PARAM_STR);
+      $saveAccount->bindValue(':hash', $passwordHash, PDO::PARAM_STR);
+      $saveAccount->bindValue(':salt', utf8_encode($salt), PDO::PARAM_STR);
+      $saveAccount->bindValue(':skey', $skey, PDO::PARAM_INT);
+      $saveAccount->bindValue(':akey', $akey, PDO::PARAM_INT);
+      $saveAccount->bindValue(':atype', $aType, PDO::PARAM_INT);
+      $saveAccount->bindValue(':balance', $balance, PDO::PARAM_INT);
+      $saveAccount->execute();
+      $success =  "Dein Account wurde erfolgreich erstellt. Zum <a href='../login/'>Login</a>";
+    }
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
