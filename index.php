@@ -146,6 +146,9 @@ $numTransactions = $getTransactions->rowCount();
         </div><!-- col-md-8 -->
       </div><!-- main content row -->
     </section><!-- content -->
+    <div class="footer-main">
+        &copy LEGEND-BANK 2016 - Virtual Kadcon Bank Accounts
+    </div>
     </aside>
   </body>
 </html>
