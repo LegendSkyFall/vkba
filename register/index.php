@@ -53,7 +53,7 @@ if(isset($_POST['submit'])){
       $nameIsDouble = ($checkName->rowCount() > 0) ? true: false;
       if($nameIsDouble){
         # user already have an account, exit
-        $errormMessage .= "Es existiert bereits ein Acount unter diesem Spielernamen. Mehrere Accounts sind nicht erlaubt.<br>";
+        $errorMessage .= "Es existiert bereits ein Acount unter diesem Spielernamen. Mehrere Accounts sind nicht erlaubt.<br>";
         $error = true;
       }
     }
