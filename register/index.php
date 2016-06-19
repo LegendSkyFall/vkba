@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>VKBA Rewrite Login</title>
+  <title>VKBA Rewrite Registrierung</title>
   <!-- optimization for mobile phones and small screens -->
   <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
   <meta name="description" content="Developed By LegendSkyFall">
