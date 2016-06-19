@@ -11,20 +11,21 @@ if(isset($_POST['submit'])){
   $postPassword2 = $_POST['password2'];
   $aType = $_POST['a_type'];
   $balance = 100.00;
+  $errorMessage = "";
 
   # validate password
     if(strlen($postPassword) == 0) {
-      $errormessage = 'Bitte ein Passwort angeben.<br>';
+      $errorMessage .= 'Bitte ein Passwort angeben.<br>';
       $error = true;
     }
 
     if($postPassword != $postPassword2) {
-      $errormessage = 'Die Passwörter müssen übereinstimmen.<br>';
+      $errorMessage .= 'Die Passwörter müssen übereinstimmen.<br>';
       $error = true;
     }
 
     if(strlen($postPassword) < 6) {
-      $errormessage = 'Das Passwort muss aus mindestens 6 Zeichen bestehen.<br>';
+      $errorMessage .= 'Das Passwort muss aus mindestens 6 Zeichen bestehen.<br>';
       $error = true;
     }
 
@@ -37,7 +38,7 @@ if(isset($_POST['submit'])){
 
       if($ktnNrIsDouble){
         # ktnNr already exists, generation error, exit
-        $errormessage = 'Fehler im System aufgetreten. Bitte erneut versuchen!';
+        $errorMessage .= 'Fehler im System aufgetreten. Bitte erneut versuchen!<br>';
         $error = true;
       }
     }
@@ -52,7 +53,7 @@ if(isset($_POST['submit'])){
       $nameIsDouble = ($checkName->rowCount() > 0) ? true: false;
       if($nameIsDouble){
         # user already have an account, exit
-        $errormessage = "Es existiert bereits ein Acount unter diesem Spielernamen. Mehrere Accounts sind nicht erlaubt.";
+        $errormMessage .= "Es existiert bereits ein Acount unter diesem Spielernamen. Mehrere Accounts sind nicht erlaubt.<br>";
         $error = true;
       }
     }
@@ -117,6 +118,14 @@ if(isset($_POST['submit'])){
         <h4 class="modal-title" id="myModalLabel">VKBA Rewrite Registrierung</h4>
       </div>
       <div class="modal-body">
+        <?php
+        if(!empty($errorMessage)){
+          echo "<div class='alert alert-danger' style='font-weight: bold; text-align: center'>" . $errorMessage . "</div>";
+        }
+        if(!empty($success)){
+          echo "<div class='alert alert-success' style='font-weight: bold; text-align: center'>" . $success . "</div>";
+        }
+        ?>
         <div class="row">
           <div class="col-xs-12">
             <div clas="well">
