@@ -1,6 +1,11 @@
 <?php
 # start session
 session_start();
+# deny access if not logged in
+if(!isset($_SESSION['user'])){
+  header("Location: login/");
+  exit();
+}
 # conntect to database
 require("db/pdo.inc.php");
 
