@@ -66,10 +66,7 @@ if(isset($_POST['submit'])){
     }
   }else{
       # login not successfull
-      if(!empty($activatedMessage)){
-        echo $activatedMessage;
-      }
-      $errormessage = "Zugangsdaten falsch oder Account nicht verifiziert (Anleitung gibt es <a href='http://tinyurl.com/vkba-verify'>hier</a>).Bitte erneut versuchen! Unter Umständen kann auch eine Sperrung des Accounts vorliegen.";
+      $errorMessage = "Zugangsdaten falsch oder Account nicht verifiziert (Anleitung gibt es <a href='http://tinyurl.com/vkba-verify'>hier</a>).Bitte erneut versuchen! Unter Umständen kann auch eine Sperrung des Accounts vorliegen.";
 	  	session_destroy();
   }
 }
@@ -103,6 +100,14 @@ if(isset($_POST['submit'])){
         <h4 class="modal-title" id="myModalLabel">VKBA Rewrite Login</h4>
       </div>
       <div class="modal-body">
+        <?php
+        if(!empty($activatedMessage)){
+          echo "<div class='alert alert-danger' style='font-weight: bold; text-align: center'>" . $activatedMessage . "</div>";
+        }
+        if(!empty($errorMessage)){
+          echo "<div class='alert alert-danger' style='font-weight: bold; text-align: center'>" . $errorMessage . "</div>";
+        }
+        ?>
         <div class="row">
           <div class="col-xs-12">
             <div class="well">
