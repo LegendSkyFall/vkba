@@ -26,6 +26,7 @@ $getTransactions->bindValue('userSender', $_SESSION['user'], PDO::PARAM_STR);
 $getTransactions->execute();
 $numTransactions = $getTransactions->rowCount();
 ?>
+<!DOCTYPE html>
 <html>
   <?php
   include('include/head.php');
