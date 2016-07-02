@@ -120,12 +120,12 @@ require("db/pdo.inc.php");
                   </div><!-- end stat -->
                 </div><!-- end col-md-2 -->
               </div><!-- end panel-body -->
-              <p style="text-align: center; font-weight: bold" class="help-block">
+              <p style="text-align: center; font-style: italic" class="help-block">
                 * Der gewünschte Betrag muss vorher am /w Legend auf Server 1 (geradeaus im Gebäude) am entsprechenden Bankautomaten aufgeladen werden.
                 Nach dem Klicken auf das Schild, ca. 3 Minuten warten. Anschließend die erscheinende Schaltfläche hier betätigen, welcher beim Klicken auf die Schaltfläche erscheint.
                 Das Geld wird anschließend gutgeschrieben. Die Gutschrift erfolgt global, sprich alle offenen Eingänge, auch die von anderen Spielern, werden ebenfalls bearbeitet.
               </p>
-              <p style="text-align: center; font-weight: bold" class="help-block">
+              <p style="text-align: center; font-style: italic" class="help-block">
                 ** Werbung kann für eine Woche geschaltet werden. Diese erscheint zufällig auf QuickBuy. Anschließend kann diese reaktiviert oder eine neue angelegt werden.
               </p>
             </div><!-- end panel -->
