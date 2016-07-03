@@ -40,7 +40,45 @@ include("include/head.php");
                   <th>Status</th>
                 </tr>
                 <?php
-                //TODO
+                # get transactions and list them
+                $getTransactions = $db->prepare("SELECT t_id, t_description, t_adress, t_sender, t_amount, t_type, t_date, t_state FROM Transactions WHERE t_adress=:adress oder t_sender=:sender ORDER BY t_date DESC");
+                $getTransactions->bindValue(":adress", $_SESSION['user'], PDO_PARAM_STR);
+                $getTransactions->bindValue(":sender", $_SESSION['user'], PDO_PARAM_STR);
+                $getTransactions->execute();
+                foreach($getTransactions as $Transaction){
+                  echo "<tr>";
+                    echo "<td>" . htmlspecialchars($Transaction['t_id'], ENT_QUOTES) . "</td>";
+                    echo "<td>" . htmlspecialchars($Transaction['t_description'], ENT_QUOTES) . "</td>";
+                    echo "<td>" . htmlspecialchars($Transaction['t_adress'], ENT_QUOTES) . "</td>";
+                    echo "<td>" . htmlspecialchars($Transaction['t_sender'], ENT_QUOTES) . "</td>";
+                    echo "<td>" . htmlspecialchars($Transaction['t_amount'], ENT_QUOTES) . "</td>";
+                    # check type of transaction
+                    switch($Transaction['t_type']){
+                      case($Transaction['t_type'] == 0):
+                        echo "<td>Privat</td>";
+                        break;
+                      case($Transaction['t_type'] == 1):
+                        echo "<td>System</td>";
+                        break;
+                    }
+                    echo "<td>" . htmlspecialchars($Transaction['t_date'], ENT_QUOTES) . "</td>";
+                    # check state of Transaction
+                    switch($Transaction['t_state']){
+                      case($Transaction['t_state'] == 0):
+                        echo "<td class='warning'>Ausstehend</td>";
+                        break;
+                      case($Transaction['t_state'] == 1):
+                        echo "<td class='success'>Abgeschlossen</td>";
+                        break;
+                      case($Transaction['t_state'] == 2):
+                        echo "<td class='danger'>Käuferschutz - Warte auf Rückbuchung</td>";
+                        break;
+                      case($Transaction['t_state'] ==3):
+                        echo "<td style='background-color: #d9edf7'>Rückbuchung erfolgreich</td>";
+                        break;
+                    }
+                  echo "</tr>";
+                }
                 ?>
               </table><!-- end table -->
             </div><!-- end panel-body -->
