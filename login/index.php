@@ -124,6 +124,7 @@ if(isset($_POST['submit'])){
                 </div>
                 <button type="submit" class="btn btn-success btn-block" name="submit">Login</button>
                 <a href="http://bank.legendskyfall.de#contact" class="btn btn-default btn-block">Probleme beim Einloggen?</a>
+                <div class="alert alert-warning" style="font-weight: bold; text-align: center">Um VKBARewrite nutzen zu können, müssen bestehende Accounts <a href="../migrate">migriert</a> werden.</div>
               </form>
             </div><!-- end well -->
           </div><!-- end col-xs-12 -->
