@@ -145,6 +145,19 @@ $numTransactions = $getTransactions->rowCount();
             </div>
           </section><!-- panel balance chart -->
         </div><!-- col-md-8 -->
+        <!-- notification box -->
+        <div class="col-lg-4">
+          <section class="panel">
+            <header class="panel-heading">
+              Systemmeldungen
+            </header>
+            <div class="panel-box" id="noti-box">
+              <?php
+              //TODO
+              ?>
+            </div><!-- end panel-box -->
+          </section><!-- end panel section -->
+        </div><!-- end col-lg-4 -->
       </div><!-- main content row -->
     </section><!-- content -->
     <div class="footer-main">
