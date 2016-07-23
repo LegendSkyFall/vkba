@@ -74,7 +74,7 @@ $numTransactions = $getTransactions->rowCount();
           <!-- user balance -->
           <div class="col-md-3">
             <div class="sm-st clearfix">
-              <span class="sm-st-icon st-blue"><i class="fa fa-dollar"></i></span>
+              <span style="padding-top: 22%" class="sm-st-icon st-blue"><i class="fa fa-dollar"></i></span>
               <div class="sm-st-info">
                 <span>
                   <?php
@@ -88,7 +88,7 @@ $numTransactions = $getTransactions->rowCount();
           <!-- user transaction number -->
           <div class="col-md-3">
             <div class="sm-st clearfix">
-              <span class="sm-st-icon st-red"><i class="fa fa-exchange"></i></span>
+              <span style="padding-top: 22%" class="sm-st-icon st-red"><i class="fa fa-exchange"></i></span>
               <div class="sm-st-info">
                 <span>
                   <?php
@@ -102,7 +102,7 @@ $numTransactions = $getTransactions->rowCount();
           <!-- user QuickPoints -->
           <div class="col-md-3">
             <div class="sm-st clearfix">
-              <span class="sm-st-icon st-violet"><i class="fa fa-money"></i></span>
+              <span style="padding-top: 22%" class="sm-st-icon st-violet"><i class="fa fa-money"></i></span>
               <div class="sm-st-info">
                 <span>
                   <?php
@@ -116,7 +116,7 @@ $numTransactions = $getTransactions->rowCount();
         <!-- user Account type -->
         <div class="col-md-3">
           <div class="sm-st clearfix">
-            <span class="sm-st-icon st-green"><i class="fa fa-credit-card"></i></span>
+            <span style="padding-top: 22%" class="sm-st-icon st-green"><i class="fa fa-credit-card"></i></span>
             <div class="sm-st-info">
               <span>
                 <?php
