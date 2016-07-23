@@ -19,7 +19,7 @@
         <?php
         // get active page for highlighting
         switch(basename($_SERVER["REQUEST_URI"])){
-          case basename($_SERVER["REQUEST_URI"]) == "index.php" || basename($_SERVER["REQUEST_URI"]) == "":
+          case basename($_SERVER["REQUEST_URI"]) == "index.php":
             $active = "index";
             break;
           case basename($_SERVER["REQUEST_URI"]) == "transactions.php":
@@ -30,6 +30,9 @@
             break;
           case basename($_SERVER["REQUEST_URI"]) == "quickbuy.php":
             $active = "quickbuy";
+            break;
+          default:
+            $active = "index";
             break;
         }
         ?>
