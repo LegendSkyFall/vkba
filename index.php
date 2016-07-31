@@ -36,6 +36,7 @@ $numTransactions = $getTransactions->rowCount();
     include('include/header.php');
     include('include/usernav.php');
     ?>
+    <script src="js/chart.js"></script>
     <script>
     /* will be used later so that page doesn't have to reload */
     /* function for deleting servermessages */
@@ -47,6 +48,57 @@ $numTransactions = $getTransactions->rowCount();
         }
       );
     }
+    $(function() {
+      "use strict";
+      // line chart
+      var data = {
+        labels: [
+          <?php
+          for($x=6; $x>=0; $x--){
+            echo date('d.m',strtotime(date('Y-m-d') . '-' . $x . 'days')) . ",";
+          }
+          ?>
+        ],
+        datasets: [
+          {
+            label: "Kontostand",
+            fillColor: "rgba(151,187,205,0.2)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(151,187,205,1)",
+            data: [
+              <?php
+              $getBalanceHistory = $db->prepare("SELECT balance FROM History WHERE username=:user AND h_date BETWEEN :last AND :today ORDER BY h_date ASC LIMIT 6");
+              $getBalanceHistory->bindValue(":user", $_SESSION["user"], PDO::PARAM_STR);
+              $getBalanceHistory->bindValue(":last", date('Y-m-d',strtotime(date('Y-m-d') . '-6 days')), PDO::PARAM_STR);
+              $getBalanceHistory->bindValue(":today", date('Y-m-d'), PDO::PARAM_STR);
+              $getBalanceHistory->execute();
+              # need for fill up
+              $counter = 0;
+              $historyData = $getBalanceHistory->rowCount();
+              foreach($getBalanceHistory as $balanceHistory){
+                $counter++;
+                echo $balanceHistory["balance"] . ",";
+              }
+              while($counter<6){
+                # fill empty data with zero
+                echo "0,";
+                $counter++;
+              }
+              echo $userBalance . ",";
+              ?>
+            ]
+          }
+        ]
+      };
+      new Chart(document.getElementById("balanceChart").getContext("2d")).Line(data,{
+        responsive : true,
+        bezierCurve: false,
+        maintainAspectRatio: false
+      });
+    });
     </script>
     <aside class="right-side">
       <!-- content -->
