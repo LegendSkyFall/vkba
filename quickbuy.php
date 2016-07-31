@@ -8,6 +8,23 @@ if(!isset($_SESSION['user'])){
 }
 # require db
 require("db/pdo.inc.php");
+
+# get and count active products
+$getActiveProducts = $db->prepare("SELECT qb_id FROM QuickBuy WHERE bought=0");
+$getActiveProducts->execute();
+$countActiveProducts = $getActiveProducts->rowCount();
+
+# get and count bought products
+$getBoughtProducts = $db->prepare("SELECT qb_id FROM QuickBuy WHERE bought=1 AND bought_by=:user");
+$getBoughtProducts->bindValue(":user", $_SESSION["user"], PDO::PARAM_STR);
+$getBoughtProducts->execute();
+$countBoughtProducts = $getBoughtProducts->rowCount();
+
+# get and count sold products
+$getSoldProducts = $db->prepare("SELECT qb_id FROM QuickBuy WHERE bought=1 AND qb_creator=:user");
+$getSoldProducts->bindValue(":user", $_SESSION["user"]. PDO::PARAM_STR);
+$getSoldProducts->execute();
+$countSoldProducts = $getSoldProducts->rowCount();
 ?>
 <!DOCTYPE html>
 <html>
