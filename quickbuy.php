@@ -51,7 +51,7 @@ include("include/head.php");
         <div class="col-md-2">
           <div class="stat">
             <div class="stat-icon" style="color: darkblue">
-              <a data-toggle="modal" href="#myModalQBbought"><i class="fa fa-shopping-cart fa-3x stat-elem"></i>
+              <a data-toggle="modal" href="#myModalQBbought"><i class="fa fa-shopping-cart fa-3x stat-elem"></i></a>
             </div>
             <h5 class="stat-info">Anzahl gekaufter Produkte: <?php echo $countBoughtProducts; ?></h5>
           </div><!-- end stat -->
@@ -59,7 +59,7 @@ include("include/head.php");
         <div class="col-md-2">
           <div class="stat">
             <div class="stat-icon" style="color: darkblue">
-              <a data-toggle="modal" href="#myModalQBsold"><i class="fa fa-money fa-3x stat-elem"></i>
+              <a data-toggle="modal" href="#myModalQBsold"><i class="fa fa-money fa-3x stat-elem"></i></a>
             </div>
             <h5 class="stat-info">Anzahl verkaufter Produkte: <?php echo $countSoldProducts; ?></h5>
           </div><!-- end stat -->
@@ -67,7 +67,7 @@ include("include/head.php");
         <div class="col-md-2">
           <div class="stat">
             <div class="stat-icon" style="color: darkblue">
-              <a data-toggle="modal" href="#myModalQB"><i class="fa fa-plus fa-3x stat-elem"></i>
+              <a data-toggle="modal" href="#myModalQB"><i class="fa fa-plus fa-3x stat-elem"></i></a>
             </div>
             <h5 class="stat-info">Eigenes Inserat erstellen</h5>
           </div><!-- end stat -->
@@ -77,7 +77,38 @@ include("include/head.php");
       <!-- row for quickbuy products -->
       <div class="row" style="margin-bottom: 5px">
         <?php
-        //TODO
+        # check confirm setting
+        $getConfirmState = $db->prepare("SELECT qb_confirm FROM Accounts WHERE username=:user");
+        $getConfirmState->bindValue(":user", $_SESSION["user"], PDO::PARAM_STR);
+        $getConfirmState->execute();
+        foreach($getConfirmState as $confirmState){
+          $confirmation = $confirmState["qb_confirm"];
+        }
+        # fetch available products
+        $getProducts = $db->query("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price FROM QuickBuy WHERE bought=0")->fetchAll();
+        foreach($getProducts as $product){
+          echo "<form method='post' action='quickbuy.php'>";
+            echo "<div class='col-md-3'>";
+              echo "<div class='sm-st clearfix'>";
+                echo "<input type='hidden' name='qbId' value='" . htmlspecialchars($product["qb_id"], ENT_QUOTES) . "'>";
+                echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES) . "'>";
+                if($confirmation == 0){
+                  echo "<button type='submit' name='buyInserat' class='sm-st-icon st-blue'><i class='fa fa-shopping-cart'></i></button>";
+                }else{
+                  ?>
+                  <button onclick="return confirm('Produkt wirklich kaufen?');" type="submit" name="buyInserat" class="sm-st-icon st-blue"><i class="fa fa-shopping-cart"></i></button>
+                  <?php
+                }
+                echo "<div class='sm-st-info'>";
+                  echo "<span>" . htmlspecialchars($product["qb_product"], ENT_QUOTES) . "</span>";
+                  echo htmlspecialchars($product["qb_short"], ENT_QUOTES);
+                  echo "<br><b>" . htmlspecialchars($product["qb_price"], ENT_QUOTES) . "</b><br>";
+                  echo "<i>" . htmlspecialchars($product["qb_creator"], ENT_QUOTES) . "</i>";
+                echo "</div>";
+              echo "</div>";
+            echo "</div>";
+          echo "</form>";
+        }
         ?>
       </div><!-- end row -->
     </section><!-- end section -->
