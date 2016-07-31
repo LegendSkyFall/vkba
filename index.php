@@ -153,7 +153,33 @@ $numTransactions = $getTransactions->rowCount();
             </header>
             <div class="panel-box" id="noti-box">
               <?php
-              //TODO
+              $getSystemMessages = $db->prepare("SELECT id, message, sys_type FROM SysMessage WHERE (sys_user=:user AND has_read=0) OR sys_user='*' ORDER BY id DESC");
+              $getSystemMessages->bindValue(":user", $_SESSION["user"], PDO::PARAM_STR);
+              $getSystemMessages->execute();
+              $messagesExists = ($getSystemMessages->rowCount() > 0) ? true : false;
+
+              if(!$messagesExists){
+                echo "<div class='alert alert-block alert-warning'><button data-dismiss='alert' class='close close-sm' type='button'><i class='fa fa-times'></i></button>Keine ungelesenen Meldungen</div>";
+              }else{
+                foreach($getSystemMessages as $systemMessage){
+                  echo "<form method='post' action='index.php' id='sysmessageform'>";
+                    if($systemMessage["sys_type"] == 0){
+                      echo "<div class='alert alert-block alert-info'>";
+                    }elseif($systemMessage["sys_type"] == 1){
+                      echo "<div class='alert alert-block alert-success'>";
+                    }elseif($systemMessage["sys_type"] == 2){
+                      echo "<div class='alert alert-block alert-warning'>";
+                    }elseif($systemMessage["sys_type"] == 3){
+                      echo "<div class='alert alert-block alert-danger'>";
+                    }
+                      echo "<input type='hidden' name='id' value='" . htmlspecialchars($systemMessage["id"], ENT_QUOTES) . "'>";
+                      echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
+                      echo "<button name='sysmessages' type='submit' class='close close-sm'><i class='fa fa-times'></i></button>";
+                      echo htmlspecialchars($systemMessage["message"], ENT_QUOTES);
+                    echo "</form>";
+                  echo "</div>";
+                }
+              }
               ?>
             </div><!-- end panel-box -->
           </section><!-- end panel section -->
