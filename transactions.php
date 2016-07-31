@@ -42,8 +42,8 @@ include("include/head.php");
                 <?php
                 # get transactions and list them
                 $getTransactions = $db->prepare("SELECT t_id, t_description, t_adress, t_sender, t_amount, t_type, t_date, t_state FROM Transactions WHERE t_adress=:adress OR t_sender=:sender ORDER BY t_date DESC");
-                $getTransactions->bindValue(":adress", $_SESSION['user'], PDO_PARAM_STR);
-                $getTransactions->bindValue(":sender", $_SESSION['user'], PDO_PARAM_STR);
+                $getTransactions->bindValue(":adress", $_SESSION['user'], PDO::PARAM_STR);
+                $getTransactions->bindValue(":sender", $_SESSION['user'], PDO::PARAM_STR);
                 $getTransactions->execute();
                 foreach($getTransactions as $Transaction){
                   echo "<tr>";
