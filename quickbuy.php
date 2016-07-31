@@ -21,7 +21,7 @@ $getBoughtProducts->execute();
 $countBoughtProducts = $getBoughtProducts->rowCount();
 
 # get and count sold products
-$getSoldProducts = $db->prepare("SELECT qb_id FROM QuickBuy WHERE bought=1 AND qb_creator=:user");
+$getSoldProducts = $db->prepare("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price, bought_by FROM QuickBuy WHERE bought=1 AND qb_creator=:user ORDER BY time_update DESC");
 $getSoldProducts->bindValue(":user", $_SESSION["user"]. PDO::PARAM_STR);
 $getSoldProducts->execute();
 $countSoldProducts = $getSoldProducts->rowCount();
@@ -111,6 +111,34 @@ include("include/head.php");
         }
         ?>
       </div><!-- end row -->
+      <!-- modal sold products -->
+      <div aria-hidden="true" role="dialog" tabindex="-1" id="myModalQBsold" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button aria-hidden="true" data-dismiss="modal" class="close" type="button">x</button>
+              <h4 class="modal-title">Eigene Inserate, die von anderen Spielern gekauft wurden</h4>
+            </div><!-- end modal-header -->
+            <div class="modal-body">
+              <?php
+              foreach($getSoldProducts as $soldProduct){
+                echo "<div class='sm-st clearfix'>";
+                  echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES) . "'>";
+                  echo "<span class='sm-st-icon st-blue'><i class='fa fa-shopping-cart'></i></span>";
+                  echo "<div class='sm-st-info'>";
+                    echo "<span>" . htmlspecialchars($soldProduct["qb_product"], ENT_QUOTES) . "</span>";
+                    echo htmlspecialchars($soldProduct["qb_short"], ENT_QUOTES);
+                    echo "<br><b>" . htmlspecialchars($soldProduct["qb_price"], ENT_QUOTES) . " Kadis</b><br>";
+                    echo "<i>QuickBuy-ID: <b>" . htmlspecialchars($soldProduct["qb_id"], ENT_QUOTES) . "</b></i><br>";
+                    echo "Gekauft von: <b>" . htmlspecialchars($soldProduct["bought_by"], ENT_QUOTES) . "</b>";
+                  echo "</div>";
+                echo "</div>";
+              }
+              ?>
+            </div><!-- end modal-body -->
+          </div><!-- end modal-content -->
+        </div><!-- end modal-dialog -->
+      </div><!-- end modal fade -->
     </section><!-- end section -->
   </aside><!-- end aside -->
 </body><!-- end body -->
