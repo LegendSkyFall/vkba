@@ -121,18 +121,22 @@ include("include/head.php");
             </div><!-- end modal-header -->
             <div class="modal-body">
               <?php
-              foreach($getSoldProducts as $soldProduct){
-                echo "<div class='sm-st clearfix'>";
-                  echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES) . "'>";
-                  echo "<span class='sm-st-icon st-blue'><i class='fa fa-shopping-cart'></i></span>";
-                  echo "<div class='sm-st-info'>";
-                    echo "<span>" . htmlspecialchars($soldProduct["qb_product"], ENT_QUOTES) . "</span>";
-                    echo htmlspecialchars($soldProduct["qb_short"], ENT_QUOTES);
-                    echo "<br><b>" . htmlspecialchars($soldProduct["qb_price"], ENT_QUOTES) . " Kadis</b><br>";
-                    echo "<i>QuickBuy-ID: <b>" . htmlspecialchars($soldProduct["qb_id"], ENT_QUOTES) . "</b></i><br>";
-                    echo "Gekauft von: <b>" . htmlspecialchars($soldProduct["bought_by"], ENT_QUOTES) . "</b>";
+              if($countSoldProducts == 0){
+                echo "Du hast noch kein Inserat verkauft.";
+              }else{
+                foreach($getSoldProducts as $soldProduct){
+                  echo "<div class='sm-st clearfix'>";
+                    echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES) . "'>";
+                    echo "<span class='sm-st-icon st-blue'><i class='fa fa-shopping-cart'></i></span>";
+                    echo "<div class='sm-st-info'>";
+                      echo "<span>" . htmlspecialchars($soldProduct["qb_product"], ENT_QUOTES) . "</span>";
+                      echo htmlspecialchars($soldProduct["qb_short"], ENT_QUOTES);
+                      echo "<br><b>" . htmlspecialchars($soldProduct["qb_price"], ENT_QUOTES) . " Kadis</b><br>";
+                      echo "<i>QuickBuy-ID: <b>" . htmlspecialchars($soldProduct["qb_id"], ENT_QUOTES) . "</b></i><br>";
+                      echo "Gekauft von: <b>" . htmlspecialchars($soldProduct["bought_by"], ENT_QUOTES) . "</b>";
+                    echo "</div>";
                   echo "</div>";
-                echo "</div>";
+                }  
               }
               ?>
             </div><!-- end modal-body -->
