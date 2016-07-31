@@ -93,10 +93,10 @@ include("include/head.php");
                 echo "<input type='hidden' name='qbId' value='" . htmlspecialchars($product["qb_id"], ENT_QUOTES) . "'>";
                 echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES) . "'>";
                 if($confirmation == 0){
-                  echo "<button type='submit' name='buyInserat' class='sm-st-icon st-blue'><i class='fa fa-shopping-cart'></i></button>";
+                  echo "<button type='submit' name='buyAdvert' class='sm-st-icon st-blue'><i class='fa fa-shopping-cart'></i></button>";
                 }else{
                   ?>
-                  <button onclick="return confirm('Produkt wirklich kaufen?');" type="submit" name="buyInserat" class="sm-st-icon st-blue"><i class="fa fa-shopping-cart"></i></button>
+                  <button onclick="return confirm('Produkt wirklich kaufen?');" type="submit" name="buyAdvert" class="sm-st-icon st-blue"><i class="fa fa-shopping-cart"></i></button>
                   <?php
                 }
                 echo "<div class='sm-st-info'>";
@@ -111,6 +111,22 @@ include("include/head.php");
         }
         ?>
       </div><!-- end row -->
+      <!-- modal advert creation -->
+      <div aria-hidden="true" role="dialog" tabindex="-1" id="myModalQB" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button aria-hidden="true" data-dismiss="modal" class="close" type="button">x</button>
+              <h4 class="modal-title">Eigenes Inserat erstellen</h4>
+            </div><!-- end modal-header -->
+            <div class="modal-body">
+              <?php
+              //TODO
+              ?>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- modal bought products -->
       <div aria-hidden="true" role="dialog" tabindex="-1" id="myModalQBbought" class="modal fade">
         <div class="modal-dialog">
