@@ -15,7 +15,7 @@ $getActiveProducts->execute();
 $countActiveProducts = $getActiveProducts->rowCount();
 
 # get and count bought products
-$getBoughtProducts = $db->prepare("SELECT qb_id FROM QuickBuy WHERE bought=1 AND bought_by=:user");
+$getBoughtProducts = $db->prepare("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price FROM QuickBuy WHERE bought=1 AND bought_by=:user ORDER BY time_update DESC");
 $getBoughtProducts->bindValue(":user", $_SESSION["user"], PDO::PARAM_STR);
 $getBoughtProducts->execute();
 $countBoughtProducts = $getBoughtProducts->rowCount();
@@ -111,6 +111,38 @@ include("include/head.php");
         }
         ?>
       </div><!-- end row -->
+      <!-- modal bought products -->
+      <div aria-hidden="true" role="dialog" tabindex="-1" id="myModalQBbought" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button aria-hidden="true" data-dismiss="modal" class="close" type="button">x</button>
+              <h4 class="modal-title">Inserate, welche Du von anderen Spielern gekauft hast</h4>
+            </div><!-- end modal-header -->
+            <div class="modal-body">
+              <?php
+              if($countBoughtProducts == 0){
+                echo "Du hast noch keine Inserate von anderen Spielern gekauft.";
+              }else{
+                foreach($getBoughtProducts as $boughtProduct){
+                  echo "<div class='sm-st clearfix'>";
+                    echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES) . "'>";
+                    echo "<span class='sm-st-icon st-blue'><i class='fa fa-shopping-cart'></i></span>";
+                    echo "<div class='sm-st-info'>";
+                      echo "<span>" . htmlspecialchars($boughtProduct["qb_product"], ENT_QUOTES) . "</span>";
+                      echo htmlspecialchars($boughtProduct["qb_short"], ENT_QUOTES);
+                      echo "<br><b>" . htmlspecialchars($boughtProduct["qb_price"], ENT_QUOTES) . " Kadis</b><br>";
+                      echo "<i>QuickBuy-ID: <b>" . htmlspecialchars($boughtProduct["qb_id"], ENT_QUOTES) . "</b></i><br>";
+                      echo "Verkäufer: <b>" . htmlspecialchars($boughtProduct["qb_creator"], ENT_QUOTES) . "</b><br>";
+                    echo "</div>";
+                  echo "</div>";
+                }
+              }
+              ?>
+            </div><!-- end modal-body -->
+          </div><!-- end modal-content -->
+        </div><!-- end modal-dialog -->
+      </div><!-- end modal fade -->
       <!-- modal sold products -->
       <div aria-hidden="true" role="dialog" tabindex="-1" id="myModalQBsold" class="modal fade">
         <div class="modal-dialog">
@@ -122,7 +154,7 @@ include("include/head.php");
             <div class="modal-body">
               <?php
               if($countSoldProducts == 0){
-                echo "Du hast noch kein Inserat verkauft.";
+                echo "Bisher wurde noch kein Inserat von Dir gekauft.";
               }else{
                 foreach($getSoldProducts as $soldProduct){
                   echo "<div class='sm-st clearfix'>";
@@ -136,7 +168,7 @@ include("include/head.php");
                       echo "Gekauft von: <b>" . htmlspecialchars($soldProduct["bought_by"], ENT_QUOTES) . "</b>";
                     echo "</div>";
                   echo "</div>";
-                }  
+                }
               }
               ?>
             </div><!-- end modal-body -->
