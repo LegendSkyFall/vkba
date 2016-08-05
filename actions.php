@@ -177,7 +177,7 @@ require("db/pdo.inc.php");
             Bitte gib im nachfolgendem Formular Deinen Guthaben-Code ein, um Dein VKBA-Konto manuell aufzuladen. Die Gutschrift erfolgt sofort.
             <form method="post">
               <input type="text" class="form-control" placeholder="Code eingeben" name="code" required="required"/>
-              <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+              <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
               <button type="submit" class="btn btn-block btn-primary" name="submitCode">Code einlösen</button>
               <span class="help-block">
                 Guthabencodes können am /w Legend auf Server 1 erworben werden. Dieses Verfahren eignet sich, wenn besonders schnell Guthaben benötigt wird.
