@@ -63,9 +63,9 @@ require("db/pdo.inc.php");
             $markAsRedeemed = $db->prepare("UPDATE Code SET redeemed=1 WHERE code=:code");
             $markAsRedeemed->bindValue(":code", $codeNo, PDO::PARAM_STR);
             $markAsRedeemed->execute();
-            echo "<div class='alert alert-success' style='text-align: center; font-weight: bold'><a href='#' class='lose' data-dismiss='alert' aria-label='close'>&times;</a>Die Aufladung per Code war erfolgreich. Das Geld wurde Dir gutgeschrieben.</div>";
+            echo "<div class='alert alert-success' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Die Aufladung per Code war erfolgreich. Das Geld wurde Dir gutgeschrieben.</div>";
           }else{
-            echo "<div class='alert alert-danger' style='text-align: center; font-weight: bold'><a href='#' class='lose' data-dismiss='alert' aria-label='close'>&times;</a>Aufladung per fehlgeschlagen. Code existiert nicht.</div>";
+            echo "<div class='alert alert-danger' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Aufladung per fehlgeschlagen. Code existiert nicht.</div>";
           }
         }
         ?>
