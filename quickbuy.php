@@ -219,10 +219,10 @@ if(isset($_POST["createAdvert"])){
       }
     }
     $insertAdvert = $db->prepare("INSERT INTO QuickBuy (qb_id, qb_creator, qb_product, qb_short, qb_price) VALUES (:qb_id, :qb_creator, :qb_product, :qb_short, :qb_price)");
-    $insertAdvert->bindValue(":qb_id", $quickBuyID, PDO::PARAM_INT);
+    $insertAdvert->bindValue(":qb_id", $randQuickBuyID, PDO::PARAM_INT);
     $insertAdvert->bindValue(":qb_creator", $_SESSION["user"], PDO::PARAM_STR);
     $insertAdvert->bindValue(":qb_product", $_POST["productName"], PDO::PARAM_STR);
-    $insertAdvert->bindValue(":qb_short", $_POST["productDescriptiuon"], PDO::PARAM_STR);
+    $insertAdvert->bindValue(":qb_short", $_POST["productDescription"], PDO::PARAM_STR);
     $insertAdvert->bindValue(":qb_price", $_POST["productPrice"], PDO::PARAM_STR);
     $insertAdvert->execute();
     if($insertAdvert){
