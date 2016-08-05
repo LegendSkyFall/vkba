@@ -55,7 +55,7 @@ $numTransactions = $getTransactions->rowCount();
         labels: [
           <?php
           for($x=6; $x>=0; $x--){
-            echo date('d.m',strtotime(date('Y-m-d') . '-' . $x . 'days')) . ",";
+            echo "'" . date('d.m',strtotime(date('Y-m-d') . '-' . $x . 'days')) . "',";
           }
           ?>
         ],
