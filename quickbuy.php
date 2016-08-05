@@ -307,7 +307,7 @@ include("include/head.php");
         $getProducts = $db->query("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price FROM QuickBuy WHERE bought=0")->fetchAll();
         foreach($getProducts as $product){
           echo "<form method='post' action='quickbuy.php'>";
-            echo "<div class='col-md-3'>";
+            echo "<div class='col-md-3' style='max-height: 175px; height: 175px; overflow-y: hidden'>";
               echo "<div class='sm-st clearfix'>";
                 echo "<input type='hidden' name='qbID' value='" . htmlspecialchars($product["qb_id"], ENT_QUOTES) . "'>";
                 echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES) . "'>";
