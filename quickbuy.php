@@ -25,6 +25,114 @@ $getSoldProducts = $db->prepare("SELECT qb_id, qb_creator, qb_product, qb_short,
 $getSoldProducts->bindValue(":user", $_SESSION["user"]. PDO::PARAM_STR);
 $getSoldProducts->execute();
 $countSoldProducts = $getSoldProducts->rowCount();
+
+# handle buy request
+if(isset($_POST["buyAdvert"])){
+  # CSRF-Protection
+  if($_POST["token"] != $_SESSION["csrf_token"]){
+    exit("Illegaler Zugriffsversuch!");
+  }
+  # error handling variable
+  $error = false;
+  # get QuickBuy Advert
+  $getQuickBuyAdvert = $db->prepare("SELECT qb_creator, qb_price FROM QuickBuy WHERE qb_id=:qb_id AND bought=0");
+  $getQuickBuyAdvert->bindValue(":qb_id", $_POST["qbID"], PDO::PARAM_INT);
+  $getQuickBuyAdvert->execute();
+  $advertExists = ($getQuickBuyAdvert->rowCount() > 0) ? true : false;
+  if(!$advertExists){
+    # advert doesn't exists or was already bought
+    $error = true;
+    $errorMessage = "Das Inserat existiert nicht oder wurde bereits von einem anderen Spieler gekauft.";
+  }else{
+    foreach($getQuickBuyAdvert as $quickBuyAdvert){
+      $qbCreator = $quickBuyAdvert["qb_creator"];
+      $qbPrice = $quickBuyAdvert["qb_price"];
+    }
+    # check creator
+    if($qbCreator == $_SESSION["user"]){
+      # buying own adverts is not allowed
+      $error = true;
+      $errorMessage = "Du kannst nicht Deine eigenen Inserate kaufen.";
+    }
+    # fetch users balance
+    $getBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
+    $getBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+    $getBalance->execute();
+    foreach($getBalance as $balance){
+      $userBalance = $balance["balance"];
+    }
+    # check price
+    if($userBalance < $qbPrice){
+      # not enough money
+      $error = true;
+      $errorMessage = "Du hast nicht genügend Geld, um das Inserat zu kaufen.";
+    }
+    # get creators balance
+    $getOtherBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
+    $getOtherBalance->bindValue(":username", $qbCreator, PDO::PARAM_STR);
+    $getOtherBalance->execute();
+    foreach($getOtherBalance as $otherBalance){
+      $creatorBalance = $otherBalance["balance"];
+    }
+    # calculate new balances
+    $newUserBalance = $userBalance - $qbPrice;
+    $newCreatorBalance = $creatorBalance + $qbPrice;
+  }
+  if(!$error){
+    # buy QuickBuy advert
+    $buyAdvert = $db->prepare("UPDATE QuickBuy SET bought=1, bought_by=:bought_by WHERE qb_id=:qb_id");
+    $buyAdvert->bindValue(":bought_by", $_SESSION["user"], PDO::PARAM_STR);
+    $buyAdvert->bindValue(":qb_id", $_POST["qbID"], PDO::PARAM_INT);
+    $buyAdvert->execute();
+    # update users balance
+    $updateUserBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+    $updateUserBalance->bindValue(":balance", $newUserBalance, PDO::PARAM_STR);
+    $updateUserBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+    $updateUserBalance->execute();
+    # update creators balance
+    $updateCreatorBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+    $updateCreatorBalance->bindValue(":balance", $newCreatorBalance, PDO::PARAM_STR);
+    $updateCreatorBalance->bindValue(":username", $qbCreator, PDO::PARAM_STR);
+    $updateCreatorBalance->execute();
+    # create system message for creator
+    $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 0)");
+    $createSysMessage->bindValue(":sys_user", $qbCreator, PDO::PARAM_STR);
+    $createSysMessage->bindValue(":message", "Dein QuickBuy Inserat #" . $_POST["qbID"] . " wurde von " . $_SESSION["user"] . " gekauft.", PDO::PARAM_STR);
+    $createSysMessage->execute();
+    # generate random transaction id and check whether transaction id already exists
+    $randTransactionID = mt_rand(100000000, 999999999);
+    $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+    $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+    $checkTransactionID->execute();
+    $transactionIDExists = ($checkTransactionID->rowCount() > 0) ? true : false;
+    foreach($checkTransactionID as $transaction){
+      $transactionID = $transaction["t_id"];
+    }
+    if($transactionIDExists){
+      # generate new random id
+      while($randTransactionID == $transactionID){
+        $randTransactionID = mt_rand(100000000, 999999999);
+        $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+        $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+        $checkTransactionID->execute();
+        foreach($checkTransactionID as $transaction){
+          $transactionID = $transaction["t_id"];
+        }
+      }
+    }
+    # log transaction
+    $logTransaction = $db->prepare("INSERT INTO Transactions (t_id, t_description, t_adress, t_sender, t_amount, t_type, t_date, t_state) VALUES(:t_id, :t_description, :t_adress, :t_sender, :t_amount, 0, :t_date, 1)");
+    $logTransaction->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+    $logTransaction->bindValue(":t_description", "QuickBuy (#" . $_POST["qbID"] . ")", PDO::PARAM_STR);
+    $logTransaction->bindValue(":t_adress", $qbCreator, PDO::PARAM_STR);
+    $logTransaction->bindValue(":t_sender", $_SESSION["user"], PDO::PARAM_STR);
+    $logTransaction->bindValue(":t_amount", $qbPrice, PDO::PARAM_STR);
+    $logTransaction->bindValue(":t_date", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+    $logTransaction->execute();
+    # buy successfull
+    $successMessage = "Kauf des Inserats erfolgreich. Der Käufer wurde darüber benachrichtigt.";
+  }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -39,6 +147,16 @@ include("include/head.php");
   <aside class="right-side">
     <section class="content">
       <div class="row">
+        <?php
+        if(!empty($errorMessage)){
+          # ouput errorMessage
+          echo "<div class='alert alert-danger' style='font-weight: bold; text-align: center'>" . $errorMessage . "</div>";
+        }
+        if(!empty($successMessage)){
+          # output successMessage
+          echo "<div class='alert alert-success' style='font-weight: bold; text-align: center'>" . $successMessage . "</div>";
+        }
+        ?>
         <!-- row for overview -->
         <div class="col-md-2">
           <div class="stat">
@@ -90,7 +208,7 @@ include("include/head.php");
           echo "<form method='post' action='quickbuy.php'>";
             echo "<div class='col-md-3'>";
               echo "<div class='sm-st clearfix'>";
-                echo "<input type='hidden' name='qbId' value='" . htmlspecialchars($product["qb_id"], ENT_QUOTES) . "'>";
+                echo "<input type='hidden' name='qbID' value='" . htmlspecialchars($product["qb_id"], ENT_QUOTES) . "'>";
                 echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES) . "'>";
                 if($confirmation == 0){
                   echo "<button type='submit' name='buyAdvert' class='sm-st-icon st-blue'><i class='fa fa-shopping-cart'></i></button>";
