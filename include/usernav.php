@@ -4,7 +4,7 @@
       <div class="user-panel">
         <div class="pull-left image">
           <?php
-          $getAvatar = "https://cravatar.eu/avatar" . $_SESSION['user'];
+          $getAvatar = "https://cravatar.eu/avatar/" . $_SESSION['user'];
           echo "<img src='$getAvatar' class='img-circle' alt='Avatar'/>";
           ?>
         </div>
