@@ -133,6 +133,107 @@ if(isset($_POST["buyAdvert"])){
     $successMessage = "Kauf des Inserats erfolgreich. Der Käufer wurde darüber benachrichtigt.";
   }
 }
+# handle create request
+if(isset($_POST["createAdvert"])){
+  # CSRF-Protection
+  if($_POST["token"] != $_SESSION["csrf_token"]){
+    exit("Illegaler Zugriffsversuch!");
+  }
+  # error handling variable
+  $error = false;
+  # check if product name is valid
+  if(strlen($_POST["productName"]) == 0){
+    # no product name submitted
+    $error = true;
+    $errorMessage = "Du musst einen Produktnamen angeben.";
+  }
+  # check if product name is too long
+  if(strlen($_POST["productName"]) > 50){
+    # product name too long
+    $error = true;
+    $errorMessage = "Der Produktname ist zu lang.";
+  }
+  # check if product description is valid
+  if(strlen($_POST["productDescription"]) == 0){
+    # no product description submitted
+    $error = true;
+    $errorMessage = "Du musst eine Kurzbeschreibung angeben.";
+  }
+  # check if product description is too long
+  if(strlen($_POST["productDescription"]) > 75){
+    # product description is too long
+    $error = true;
+    $errorMessage = "Die Kurzbeschreibung ist zu lang.";
+  }
+  # check if product price is a number
+  if(!is_numeric($_POST["productPrice"])){
+    # unexpected value
+    $error = true;
+    $errorMessage = "Der Preis ist ungültig.";
+  }
+  # check if product price is negative
+  if($_POST["productPrice"] <= 0){
+    # negative product price
+    $error = true;
+    $errorMessage = "Der Preis darf nicht negativ sein.";
+  }
+  # check if product price is too high
+  if($_POST["productPrice"] > 9999){
+    # product price is too high
+    $error = true;
+    $errorMessage = "Der Preis darf 9999 Kadis nicht übersteigen.";
+  }
+  # check account type
+  if($_SESSION["ktype"] != 1){
+    # no trader account, check if trader addon is active
+    $checkTraderAddon = $db->prepare("SELECT username FROM AddOns WHERE add_id=2 AND username=:username");
+    $checkTraderAddon->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+    $checkTraderAddon->execute();
+    $hasTraderAddon = ($checkTraderAddon->rowCount() > 0) ? true : false;
+    if(!$hasTraderAddon){
+      # trader addon not activated
+      $error = true;
+      $errorMessage = "Du benötigst ein Händler-Konto bzw. das Werbe-Addon, um ein Inserat erstellen zu können.";
+    }
+  }
+  if(!$error){
+    # generate random quickbuy id and check whether quickbuy id already exists
+    $randQuickBuyID = mt_rand(10000000, 99999999);
+    $checkQuickBuyID = $db->prepare("SELECT qb_id FROM QuickBuy WHERE qb_id=:qb_id");
+    $checkQuickBuyID->bindValue(":qb_id", $randQuickBuyID, PDO::PARAM_INT);
+    $checkQuickBuyID->execute();
+    $quickBuyIDExists = ($checkQuickBuyID->rowCount() > 0) ? true : false;
+    foreach($checkQuickBuyID as $quickBuy){
+      $quickBuyID = $quickBuy["qb_id"];
+    }
+    if($quickBuyIDExists){
+      # generate new random id
+      while($randQuickBuyID == $quickBuyID){
+        $randQuickBuyID = mt_rand(100000000, 999999999);
+        $checkQuickBuyID = $db->prepare("SELECT qb_id FROM QuickBuy WHERE qb_id=:qb_id");
+        $checkQuickBuyID->bindValue(":qb_id", $randQuickBuyID, PDO::PARAM_INT);
+        $checkQuickBuyID->execute();
+        foreach($checkQuickBuyID as $quickBuy){
+          $quickBuyID = $quickBuy["qb_id"];
+        }
+      }
+    }
+    $insertAdvert = $db->prepare("INSERT INTO QuickBuy (qb_id, qb_creator, qb_product, qb_short, qb_price) VALUES (:qb_id, :qb_creator, :qb_product, :qb_short, :qb_price)");
+    $insertAdvert->bindValue(":qb_id", $quickBuyID, PDO::PARAM_INT);
+    $insertAdvert->bindValue(":qb_creator", $_SESSION["user"], PDO::PARAM_STR);
+    $insertAdvert->bindValue(":qb_product", $_POST["productName"], PDO::PARAM_STR);
+    $insertAdvert->bindValue(":qb_short", $_POST["productDescriptiuon"], PDO::PARAM_STR);
+    $insertAdvert->bindValue(":qb_price", $_POST["productPrice"], PDO::PARAM_STR);
+    $insertAdvert->execute();
+    if($insertAdvert){
+      # advert creation successfull
+      $successMessage = "Die Erstellung des Inserats war erfolgreich. Du wirst benachrichtigt, wenn es von einem Spieler gekauft wird.";
+    }else{
+      # an error occured
+      $errorMessage = "Ein unbekannter Fehler beim Erstellen des Inserats ist aufgetreten.";
+    }
+  }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -238,9 +339,19 @@ include("include/head.php");
               <h4 class="modal-title">Eigenes Inserat erstellen</h4>
             </div><!-- end modal-header -->
             <div class="modal-body">
-              <?php
-              //TODO
-              ?>
+              <form method="post">
+                <label>Produktname</label>
+                <input type="text" class="form-control" name="productName" placeholder="Welches Produkt möchtest Du anbieten?" required="required" />
+                <label>Kurzbeschreibung</label>
+                <input type="text" class="form-control" name="productDescription" placeholder="z.B. weitere Informationen oder Mengenangabe" required="required" />
+                <label>Preis</label>
+                <input type="number" class="form-control" name="productPrice" min="1" max="9999" step="0.01" required="required" />
+                <div class="checkbox disabled">
+                  <label><input type="checkbox" disabled>Premiumversand anbieten (derzeit noch nicht verfügbar)</label>
+                </div>
+                <input type="hidden" value="<?php echo $_SESSION['csrf_token']; ?>" name="token">
+                <button type="submit" class="btn btn-block btn-primary" name="createAdvert">Inserat erstellen</button>
+              </form>
             </div>
           </div>
         </div>
