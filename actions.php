@@ -122,7 +122,7 @@ require("db/pdo.inc.php");
               $updateReceiverBalance->bindValue(":username", $receiverUsername, PDO::PARAM_STR);
               $updateReceiverBalance->execute();
               # create system message for receiver
-              $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 0)");
+              $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 1)");
               $createSysMessage->bindValue(":sys_user", $receiverUsername, PDO::PARAM_STR);
               $createSysMessage->bindValue(":message", "Überweisung von " . $_SESSION["user"] . " in Höhe von " . $_POST["amount"] . " Kadis eingegangen. Verwendungszweck: " . $_POST["usage"], PDO::PARAM_STR);
               $createSysMessage->execute();
