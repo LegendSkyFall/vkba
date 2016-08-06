@@ -79,7 +79,7 @@ require("db/pdo.inc.php");
                 <div class="col-md-2">
                   <div class="stat">
                     <div class="stat-icon" style="color: #fa8564">
-                      <a data-toggle="modal" href="#myModal-1"><i class="fa fa-ticket fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                      <a data-toggle="modal" href="#modalPayment"><i class="fa fa-ticket fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
                     </div>
                     <h5 class="stat-info" style="background-color: #FAFAFA">Überweisung tätigen</h5>
                   </div><!-- end stat -->
@@ -165,6 +165,44 @@ require("db/pdo.inc.php");
           &copy LEGEND-BANK 2016 - Virtual Kadcon Bank Accounts
       </div>
     </aside><!-- end aside -->
+    <!-- Modal payment -->
+    <div class="modal fade" id="modalPayment" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h4 class="modal-title">Überweisung tätigen</h4>
+          </div>
+          <div class="modal-body">
+            Um Geld anderen Spielern überweisen zu können, muss das nachfolgende Formular ausgefüllt werden.
+            <form method="post">
+              <label>Empfänger*</label>
+              <input type="number" class="form-control" placeholder="Kontonummer des Empfängers angeben" name="ktnNr" required="required"/>
+              <label>Verwendungszweck</label>
+              <input type="text" class="form-control" placeholder="Verwendungszweck angeben" name="usage" required="required" />
+              <label>Betrag</label>
+              <input type="number" class="form-control" placeholder="Betrag angeben" name="amount" required="required" />
+              <label>Überweisungsvariante wählen</label>
+              <select class="form-control" id="paymentSelection" name="paymentSelection">
+                <option value="1">Standardüberweisung</option>
+                <option value="2">Terminüberweisung</option>
+                <option value="3">Dauerüberweisung</option>
+              </select>
+              <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
+              <br>
+              <button type="submit" class="btn btn-block btn-primary" name="submitPayment">Überweisung tätigen</button>
+              <span class="help-block">
+                Es gibt drei verschiedene Überweisungstypen. Standardüberweisungen werden unmittelbar nach Absenden des Formulars dem Empfänger gutgeschrieben,
+                während Terminüberweisungen erst an dem angegebenem, gewünschten Datum ausgeführt werden.
+                Dauerüberweisungen sind Überweisungen, die automatisch in selbst definierten Intervallen an den Empfänger ausgezahlt werden.
+                Abhängig des ausgewählten Typs müssen unter Umständen weitere Informationen angegeben werden.
+                <br>*Die Kontonummer des Empfängers kann unter 'Kontakte', wenn auf den Loginnamen geklickt wird, eingesehen werden.
+              </span>
+            </form>
+          </div>
+        </div><!-- end modal-content -->
+      </div><!-- end modal-dialog -->
+    </div><!-- end modal -->
     <!-- Modal code -->
     <div class="modal fade" id="modalCode" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog">
