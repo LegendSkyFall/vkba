@@ -124,7 +124,7 @@ require("db/pdo.inc.php");
               # create system message for receiver
               $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 1)");
               $createSysMessage->bindValue(":sys_user", $receiverUsername, PDO::PARAM_STR);
-              $createSysMessage->bindValue(":message", "Überweisung von " . $_SESSION["user"] . " in Höhe von " . $_POST["amount"] . " Kadis eingegangen. Verwendungszweck: " . $_POST["usage"], PDO::PARAM_STR);
+              $createSysMessage->bindValue(":message", "Überweisung von " . $_SESSION["user"] . " in Höhe von " . round($_POST["amount"], 2) . " Kadis eingegangen. Verwendungszweck: " . $_POST["usage"], PDO::PARAM_STR);
               $createSysMessage->execute();
               # generate random transaction id and check whether transaction id already exists
               $randTransactionID = mt_rand(100000000, 999999999);
