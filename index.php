@@ -104,17 +104,45 @@ $numTransactions = $getTransactions->rowCount();
       <!-- content -->
       <section class="content">
         <?php
-        # QuickBuy confirmation message
-        if(!empty($qbConfirmMessage)){
-          echo $qbConfirmMessage;
+        # handle read sysMessage request
+        if(isset($_POST["readSysMessage"])){
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]){
+            exit("Illegaler Zugriffsversuch!");
+          }
+          # error handling variable
+          $error = false;
+          # check sysMessage ID
+          $checkSysMessage = $db->prepare("SELECT id FROM SysMessage WHERE id=:id AND sys_user=:sys_user AND has_read=0");
+          $checkSysMessage->bindValue(":id", $_POST["sysID"], PDO::PARAM_INT);
+          $checkSysMessage->bindValue(":sys_user", $_SESSION["user"], PDO::PARAM_STR);
+          $checkSysMessage->execute();
+          $sysMessageExists = ($checkSysMessage->rowCount() > 0) ? true : false;
+          if(!$sysMessageExists){
+            # message doesn't exist or is not a user message
+            $error = true;
+            $errorMessage = "Die Meldung existiert nicht, wurde bereits als gelesen markiert oder sie ist dir nicht zugeordnet. Systemmeldungen können nicht als gelesen markiert werden.";
+          }
+          if(!$error){
+            # mark as read
+            $markAsRead = $db->prepare("UPDATE SysMessage SET has_read=1 WHERE id=:id");
+            $markAsRead->bindValue(":id", $_POST["sysID"], PDO::PARAM_INT);
+            $markAsRead->execute();
+            if($markAsRead){
+              # successfull
+              $successMessage = "Meldung erfolgreich als gelesen markiert.";
+            }
+          }
+
         }
-        # AddOn message
-        if(!empty($addonMessage)){
-          echo $addonMessage;
+
+        if(!empty($errorMessage)){
+          # ouput errorMessage
+          echo "<div class='alert alert-danger' style='font-weight: bold; text-align: center'>" . $errorMessage . "</div>";
         }
-        # system message deletion
-        if(!empty($sysMessage)){
-          echo $sysMessage;
+        if(!empty($successMessage)){
+          # output successMessage
+          echo "<div class='alert alert-success' style='font-weight: bold; text-align: center'>" . $successMessage . "</div>";
         }
         ?>
         <span id="delMessage"></span> <!-- sysMessage alert will appear here -->
@@ -224,9 +252,9 @@ $numTransactions = $getTransactions->rowCount();
                     }elseif($systemMessage["sys_type"] == 3){
                       echo "<div class='alert alert-block alert-danger'>";
                     }
-                      echo "<input type='hidden' name='id' value='" . htmlspecialchars($systemMessage["id"], ENT_QUOTES) . "'>";
+                      echo "<input type='hidden' name='sysID' value='" . htmlspecialchars($systemMessage["id"], ENT_QUOTES) . "'>";
                       echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
-                      echo "<button name='sysmessages' type='submit' class='close close-sm'><i class='fa fa-times'></i></button>";
+                      echo "<button name='readSysMessage' type='submit' class='close close-sm'><i class='fa fa-times'></i></button>";
                       echo htmlspecialchars($systemMessage["message"], ENT_QUOTES);
                     echo "</form>";
                   echo "</div>";
