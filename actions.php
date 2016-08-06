@@ -23,14 +23,6 @@ require("db/pdo.inc.php");
       <!-- content -->
       <section class="content">
         <?php
-        # error message
-        if(!empty($errorMessage)){
-          echo "<div class='alert alert-danger' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $errorMessage . "</div>";
-        }
-        # success message
-        if(!empty($successMessage)){
-          echo "<div class='alert alert-success' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $successMessage . "</div>";
-        }
         # handle payment submit
         if(isset($_POST["submitPayment"])){
           # CSRF-Protection
@@ -210,6 +202,14 @@ require("db/pdo.inc.php");
           }else{
             $errorMessage = "Aufladung per Code fehlgeschlagen. Code existiert nicht.";
           }
+        }
+        # error message
+        if(!empty($errorMessage)){
+          echo "<div class='alert alert-danger' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $errorMessage . "</div>";
+        }
+        # success message
+        if(!empty($successMessage)){
+          echo "<div class='alert alert-success' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $successMessage . "</div>";
         }
         ?>
         <div class="row">
