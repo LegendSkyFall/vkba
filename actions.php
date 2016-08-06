@@ -23,13 +23,150 @@ require("db/pdo.inc.php");
       <!-- content -->
       <section class="content">
         <?php
-        # QuickBuy confirmation message
-        if(!empty($qbConfirmMessage)){
-          echo $qbConfirmMessage;
+        # error message
+        if(!empty($errorMessage)){
+          echo "<div class='alert alert-danger' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $errorMessage . "</div>";
         }
-        # AddOn message
-        if(!empty($addonMessage)){
-          echo $addonMessage;
+        # success message
+        if(!empty($successMessage)){
+          echo "<div class='alert alert-success' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $successMessage . "</div>";
+        }
+        # handle payment submit
+        if(isset($_POST["submitPayment"])){
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]){
+            exit("Illegaler Zugriffsversuch!");
+          }
+          # error handling variable
+          $error = false;
+          # check if requested amount is a number
+          if(!is_numeric($_POST["amount"])){
+            # unexpected value
+            $error = true;
+            $errorMessage = "Der Betrag muss eine Zahl sein.";
+          }
+          # check if amount is negative
+          if($_POST["amount"] <= 0){
+            # negative amount
+            $error = true;
+            $errorMessage = "Der Betrag darf nicht negativ sein.";
+          }
+          # check users balance
+          $getUserBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
+          $getUserBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+          $getUserBalance->execute();
+          foreach($getUserBalance as $balance){
+            $userBalance = $balance["balance"];
+          }
+          # check if requested amount is higher than available money
+          if($_POST["amount"] > $userBalance){
+            # not enough money
+            $error = true;
+            $errorMessage = "Du hast nicht genügend Geld.";
+          }
+          # check if usage was submitted and if is valid
+          if(strlen($_POST["usage"]) == 0 || strlen($_POST["usage"]) > 255){
+            # no usage or too long
+            $error = true;
+            $errorMessage = "Bitte gib einen Verwendungszweck an und achte darauf, dass dieser nicht länger als 255 Zeichen lang sein darf.";
+          }
+          # check if ktnNr exists and get receiver balance
+          $getReceiver = $db->prepare("SELECT balance, username FROM Accounts WHERE ktn_nr=:ktn_nr");
+          $getReceiver->bindValue(":ktn_nr", $_POST["ktnNr"], PDO::PARAM_STR);
+          $getReceiver->execute();
+          $receiverExists = ($getReceiver->rowCount() > 0) ? true : false;
+          if(!$receiverExists){
+            # receiver doesn't exist
+            $error = true;
+            $errorMessage = "Die angegebene Empfänger-Kontonummer konnte nicht gefunden werden.";
+          }
+          foreach($getReceiver as $receiver){
+            $receiverUsername = $receiver["username"];
+            $receiverBalance = $receiver["balance"];
+          }
+          # check if receiver is valid
+          if($receiverUsername == $_SESSION["user"]){
+            # payments to yourself is not allowed
+            $error = true;
+            $errorMessage = "Überweisungen an sich selbst sind nicht zulässig";
+          }
+          # calculate new balances
+          $newUserBalance = round($userBalance - $_POST["amount"], 2);
+          $newReceiverBalance = round($receiverBalance + $_POST["amount"], 2);
+          if($_POST["paymentSelection"] == 1){
+            # default payment
+            $paymentSelection = 1;
+          }elseif($_POST["paymentSelection"] == 2){
+            # date payment
+            $paymentSelection = 2;
+            # check date input //TODO
+          }elseif($_POST["paymentSelection"] == 3){
+            # permanent transfer
+            $paymentSelection = 3;
+            # check date input //TODO
+            # check interval //TODO
+          }else{
+            # invalid payment selection
+            $error = true;
+            $errorMessage = "Ungültige Überweisungsvariante ausgewählt.";
+          }
+          # if no error, make payment
+          if(!$error){
+            if($paymentSelection == 1){
+              # update users balance
+              $updateUserBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+              $updateUserBalance->bindValue(":balance", $newUserBalance, PDO::PARAM_STR);
+              $updateUserBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+              $updateUserBalance->execute();
+              # update receivers balance
+              $updateReceiverBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+              $updateReceiverBalance->bindValue(":balance", $newReceiverBalance, PDO::PARAM_STR);
+              $updateReceiverBalance->bindValue(":username", $receiverUsername, PDO::PARAM_STR);
+              $updateReceiverBalance->execute();
+              # create system message for receiver
+              $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 0)");
+              $createSysMessage->bindValue(":sys_user", $receiverUsername, PDO::PARAM_STR);
+              $createSysMessage->bindValue(":message", "Überweisung von " . $_SESSION["user"] . " in Höhe von " . $_POST["amount"] . " Kadis eingegangen. Verwendungszweck: " . $_POST["usage"], PDO::PARAM_STR);
+              $createSysMessage->execute();
+              # generate random transaction id and check whether transaction id already exists
+              $randTransactionID = mt_rand(100000000, 999999999);
+              $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+              $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+              $checkTransactionID->execute();
+              $transactionIDExists = ($checkTransactionID->rowCount() > 0) ? true : false;
+              foreach($checkTransactionID as $transaction){
+                $transactionID = $transaction["t_id"];
+              }
+              if($transactionIDExists){
+                # generate new random id
+                while($randTransactionID == $transactionID){
+                  $randTransactionID = mt_rand(100000000, 999999999);
+                  $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+                  $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+                  $checkTransactionID->execute();
+                  foreach($checkTransactionID as $transaction){
+                    $transactionID = $transaction["t_id"];
+                  }
+                }
+              }
+              # log transaction
+              $logTransaction = $db->prepare("INSERT INTO Transactions (t_id, t_description, t_adress, t_sender, t_amount, t_type, t_date, t_state) VALUES(:t_id, :t_description, :t_adress, :t_sender, :t_amount, 0, :t_date, 1)");
+              $logTransaction->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+              $logTransaction->bindValue(":t_description", "Standardüberweisung", PDO::PARAM_STR);
+              $logTransaction->bindValue(":t_adress", $receiverUsername, PDO::PARAM_STR);
+              $logTransaction->bindValue(":t_sender", $_SESSION["user"], PDO::PARAM_STR);
+              $logTransaction->bindValue(":t_amount", $_POST["amount"], PDO::PARAM_STR);
+              $logTransaction->bindValue(":t_date", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+              $logTransaction->execute();
+              if($logTransaction){
+                # successfull
+                $successMessage = "Standardüberweisung erfolgreich ausgeführt.";
+              }
+            }else{
+              $errorMessage = "Derzeit ist nur die Standardüberweisung aktiviert.";
+            }
+          }
+
         }
         # handle code submit
         if(isset($_POST["submitCode"])){
@@ -63,9 +200,9 @@ require("db/pdo.inc.php");
             $markAsRedeemed = $db->prepare("UPDATE Code SET redeemed=1 WHERE code=:code");
             $markAsRedeemed->bindValue(":code", $codeNo, PDO::PARAM_STR);
             $markAsRedeemed->execute();
-            echo "<div class='alert alert-success' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Die Aufladung per Code war erfolgreich. Das Geld wurde Dir gutgeschrieben.</div>";
+            $successMessage = "Die Aufladung per Code war erfolgreich. Das Geld wurde Dir gutgeschrieben.";
           }else{
-            echo "<div class='alert alert-danger' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Aufladung per Code fehlgeschlagen. Code existiert nicht.</div>";
+            $errorMessage = "Aufladung per Code fehlgeschlagen. Code existiert nicht.";
           }
         }
         ?>
