@@ -203,6 +203,15 @@ require("db/pdo.inc.php");
             $errorMessage = "Aufladung per Code fehlgeschlagen. Code existiert nicht.";
           }
         }
+        # handle auto submit
+        if(isset($_POST["submitAuto"])){
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]){
+            exit("Illegaler Zugriffsversuch!");
+          }
+          echo "<meta http-equiv='refresh' content='0; /readout'>";
+          exit();
+        }
         # error message
         if(!empty($errorMessage)){
           echo "<div class='alert alert-danger' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $errorMessage . "</div>";
@@ -246,7 +255,7 @@ require("db/pdo.inc.php");
                 <div class="col-md-2">
                   <div class="stat">
                     <div class="stat-icon" style="color: #fa8564">
-                      <a data-toggle="modal" href="#myModal-4"><i class="fa fa-check-circle-o fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                      <a data-toggle="modal" href="#modalAuto"><i class="fa fa-check-circle-o fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
                     </div>
                     <h5 class="stat-info" style="background-color: #FAFAFA">Kontoaufladung automatisch*</h5>
                   </div><!-- end stat -->
@@ -305,7 +314,7 @@ require("db/pdo.inc.php");
         </div><!-- end row -->
       </section><!-- end section -->
       <div class="footer-main">
-          &copy LEGEND-BANK 2016 - Virtual Kadcon Bank Accounts
+          &copy; LEGEND-BANK 2016 - Virtual Kadcon Bank Accounts
       </div>
     </aside><!-- end aside -->
     <!-- Modal payment -->
@@ -364,6 +373,29 @@ require("db/pdo.inc.php");
                 Guthabencodes können am /w Legend auf Server 1 erworben werden. Dieses Verfahren eignet sich, wenn besonders schnell Guthaben benötigt wird.
                 Jeder Code kann nur einmal eingelöst werden. Die Gutschrift erfolgt unmittelbar nach Eingabe.
                 Alternativ gibt es auch die automatische Kontoaufladung, welche für erhöhten Komfort sorgt.
+              </span>
+            </form>
+          </div>
+        </div><!-- end modal-content -->
+      </div><!-- end modal-dialog -->
+    </div><!-- end modal -->
+    <!-- Modal code -->
+    <div class="modal fade" id="modalAuto" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h4 class="modal-title">Automatische Kontoaufladung</h4>
+          </div>
+          <div class="modal-body">
+            Die automatische Kontoaufladung ist die bequemste und einfachste Art, sein Konto aufzuladen. Betätige die nachfolgende Schaltfläche, wenn Du zuvor Geld an einem VKBA-Geldautomaten eingezahlt hast.
+            <form method="post">
+              <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
+              <button type="submit" class="btn btn-block btn-primary" name="submitAuto">Automatisch Konto aufladen</button>
+              <span class="help-block">
+                Alle VKBA-Akzeptazstellen sind dem Foren-Thread zu entnehmen. Hauptstandort ist der /w Legend auf Server 1.
+                Das automatische Aufladen geht frühestens nach 5 Minuten wieder. Das Aufladen ist global, alle offenen Eingänge werden bearbeitet.
+                Nach dem Einzahlen an einem VKBA-Geldautomaten bitte vor Betätigung der Schaltfläche einige Minuten warten.
               </span>
             </form>
           </div>
