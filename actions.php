@@ -153,7 +153,7 @@ require("db/pdo.inc.php");
               $logTransaction->bindValue(":t_description", "Standardüberweisung", PDO::PARAM_STR);
               $logTransaction->bindValue(":t_adress", $receiverUsername, PDO::PARAM_STR);
               $logTransaction->bindValue(":t_sender", $_SESSION["user"], PDO::PARAM_STR);
-              $logTransaction->bindValue(":t_amount", $_POST["amount"], PDO::PARAM_STR);
+              $logTransaction->bindValue(":t_amount", round($_POST["amount"], 2), PDO::PARAM_STR);
               $logTransaction->bindValue(":t_date", date("Y-m-d H:i:s"), PDO::PARAM_STR);
               $logTransaction->execute();
               if($logTransaction){
