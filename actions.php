@@ -64,6 +64,12 @@ require("db/pdo.inc.php");
             $error = true;
             $errorMessage = "Du hast nicht genügend Geld.";
           }
+          # check if requested amount is higher than allowed amount
+          if($_POST["amount"] > 9999){
+            # amount to high
+            $error = true;
+            $errorMessage = "Überweisungen sind nur bis 9999 Kadis erlaubt.";
+          }
           # check if usage was submitted and if is valid
           if(strlen($_POST["usage"]) == 0 || strlen($_POST["usage"]) > 255){
             # no usage or too long
@@ -314,11 +320,11 @@ require("db/pdo.inc.php");
             Um Geld anderen Spielern überweisen zu können, muss das nachfolgende Formular ausgefüllt werden.
             <form method="post">
               <label>Empfänger*</label>
-              <input type="number" class="form-control" placeholder="Kontonummer des Empfängers angeben" name="ktnNr" required="required"/>
+              <input type="number" class="form-control" placeholder="Kontonummer des Empfängers angeben" name="ktnNr" required="required" min="10000000" max="99999999" />
               <label>Verwendungszweck</label>
               <input type="text" class="form-control" placeholder="Verwendungszweck angeben" name="usage" required="required" />
               <label>Betrag</label>
-              <input type="number" class="form-control" placeholder="Betrag angeben" name="amount" required="required" />
+              <input type="number" class="form-control" placeholder="Betrag angeben" name="amount" required="required" min="0.01" max="9999" step="0.01"/>
               <label>Überweisungsvariante wählen</label>
               <select class="form-control" id="paymentSelection" name="paymentSelection">
                 <option value="1">Standardüberweisung</option>
