@@ -212,6 +212,46 @@ require("db/pdo.inc.php");
           echo "<meta http-equiv='refresh' content='0; /readout'>";
           exit();
         }
+        # handle report submit
+        if(isset($_POST["submitReport"])){
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]){
+            exit("Illegaler Zugriffsversuch!");
+          }
+          # error handling variable
+          $error = false;
+          # //TODO detailed information -> new table for admin interface
+          $checkTransactionID = $db->prepare("SELECT t_state FROM Transactions WHERE (t_adress=:t_adress OR t_sender=:t_sender) AND t_id =:t_id");
+          $checkTransactionID->bindValue(":t_adress", $_SESSION["user"], PDO::PARAM_STR);
+          $checkTransactionID->bindValue(":t_sender", $_SESSION["user"], PDO::PARAM_STR);
+          $checkTransactionID->bindValue(":t_id", $_POST["reportID"], PDO::PARAM_STR);
+          $checkTransactionID->execute();
+          $transactionIDValid = ($checkTransactionID->rowCount() > 0) ? true : false;
+          if(!$transactionIDValid){
+            $error = true;
+            $errorMessage = "Ungültige Transaktions-ID oder Dir nicht zugeordnet.";
+          }else{
+            foreach($checkTransactionID as $transaction){
+              $transactionState = $transaction["t_state"];
+            }
+            if($transactionState == 2){
+              # already reported
+              $error = true;
+              $errorMessage = "Die Transaktion wurde bereits von Dir gemeldet. Der Fall wird noch genauer geprüft.";
+            }
+          }
+          if(!$error){
+            # //TODO insert for admin interface with detailed information
+            # mark transaction
+            $reportTransaction = $db->prepare("UPDATE Transactions SET t_state=2 WHERE t_id=:t_id");
+            $reportTransaction->bindValue(":t_id", $_POST["reportID"], PDO::PARAM_INT);
+            $reportTransaction->execute();
+            if($reportTransaction){
+              # successfull
+              $successMessage = "Der Fall wurde gemeldet und nun näher untersucht. Du wirst benachrichtigt, sobald der Fall bearbeitet wurde. Wir hoffen, Du hast weiterhin Spaß bei VKBA und bedanken uns für das Melden.";
+            }
+          }
+        }
         # error message
         if(!empty($errorMessage)){
           echo "<div class='alert alert-danger' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $errorMessage . "</div>";
@@ -263,7 +303,7 @@ require("db/pdo.inc.php");
                 <div class="col-md-2">
                   <div class="stat">
                     <div class="stat-icon" style="color: #fa8564">
-                      <a data-toggle="modal" href="#myModal-6"><i class="fa fa-shield fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                      <a data-toggle="modal" href="#modalReport"><i class="fa fa-shield fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
                     </div>
                     <h5 class="stat-info" style="background-color: #FAFAFA">Käuferschutz beanspruchen</h5>
                   </div><!-- end stat -->
@@ -379,7 +419,7 @@ require("db/pdo.inc.php");
         </div><!-- end modal-content -->
       </div><!-- end modal-dialog -->
     </div><!-- end modal -->
-    <!-- Modal code -->
+    <!-- Modal auto -->
     <div class="modal fade" id="modalAuto" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -396,6 +436,33 @@ require("db/pdo.inc.php");
                 Alle VKBA-Akzeptazstellen sind dem Foren-Thread zu entnehmen. Hauptstandort ist der /w Legend auf Server 1.
                 Das automatische Aufladen geht frühestens nach 5 Minuten wieder. Das Aufladen ist global, alle offenen Eingänge werden bearbeitet.
                 Nach dem Einzahlen an einem VKBA-Geldautomaten bitte vor Betätigung der Schaltfläche einige Minuten warten.
+              </span>
+            </form>
+          </div>
+        </div><!-- end modal-content -->
+      </div><!-- end modal-dialog -->
+    </div><!-- end modal -->
+    <!-- Modal report -->
+    <div class="modal fade" id="modalReport" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h4 class="modal-title">Käuferschutzbeantragung</h4>
+          </div>
+          <div class="modal-body">
+            Wir bemühen uns stets, Betrüger von unserem Dienst fernzuhalten. Sollte es doch einmal zu einem Betrugsfall kommen oder der Verdacht auf Betrug besteht, kann dies hier gemeldet werden.<br>
+            Wir werden den Fall intern prüfen und entsprechende Maßnahmen ergreifen. Sollte sich der Fall bestätigen, erhältst Du Dein Geld selbstverständlich erstattet.
+            <form method="post">
+              <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
+              <br>
+              <label>Betroffene Transaktion</label>
+              <input type="number" name="reportID" class="form-control" min="100000000" max="999999999" required="required" placeholder="Transaktions-ID angeben"/>
+              <button type="submit" class="btn btn-block btn-primary" name="submitReport">Käuferschutz beanspruchen</button>
+              <span class="help-block">
+                Um den Käuferschutz beanspruchen zu können, ist die Angabe der betroffenen Transaktions-ID notwendig, damit wir den Fall genauer prüfen könnnen.
+                Die Transaktions-ID ist unter "Transakionen" im Menü auf der rechten Seite aufgelistet.
+                Nach Überprüfung des Falls wirst Du benachrichtigt.
               </span>
             </form>
           </div>
