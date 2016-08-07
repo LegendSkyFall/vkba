@@ -327,7 +327,7 @@ require("db/pdo.inc.php");
                 <div class="col-md-2">
                   <div class="stat">
                     <div class="stat-icon" style="color: #fa8564">
-                      <a data-toggle="modal" href="#myModal-1"><i class="fa fa-star-o fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                      <a data-toggle="modal" href="#myModal-1"><i class="fa fa-trophy fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
                     </div>
                     <h5 class="stat-info" style="background-color: #FAFAFA">QuickPoints-Prämien</h5>
                   </div><!-- end stat -->
