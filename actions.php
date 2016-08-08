@@ -230,9 +230,8 @@ require("db/pdo.inc.php");
             $logTransaction->execute();
             if($logTransaction){
               # successfull
-              $successMessage = "Standardüberweisung erfolgreich ausgeführt.";
+              $successMessage = "Die Aufladung per Code war erfolgreich. Das Geld wurde Dir gutgeschrieben.";
             }
-            $successMessage = "Die Aufladung per Code war erfolgreich. Das Geld wurde Dir gutgeschrieben.";
           }else{
             $errorMessage = "Aufladung per Code fehlgeschlagen. Code existiert nicht.";
           }
