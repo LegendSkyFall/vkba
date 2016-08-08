@@ -254,7 +254,7 @@ require("db/pdo.inc.php");
           if(!$receiverExists){
             # receiver doesn't exist
             $error = true;
-            $errorMessage = "Der Empfänger existiert nicht. Gib eine gültige Kontonummer an. Möchtest Du die Rechnung keinem Empfänger zuordnen, so muss '77777777' als Kontonummer angegeben werden."
+            $errorMessage = "Der Empfänger existiert nicht. Gib eine gültige Kontonummer an. Möchtest Du die Rechnung keinem Empfänger zuordnen, so muss '77777777' als Kontonummer angegeben werden.";
           }
           if(!$error){
             # short url function
