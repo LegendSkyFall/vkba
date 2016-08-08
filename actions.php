@@ -577,9 +577,9 @@ require("db/pdo.inc.php");
                 <div class="col-md-2">
                   <div class="stat">
                     <div class="stat-icon" style="color: #fa8564">
-                      <a data-toggle="modal" href="#myModal-1"><i class="fa fa-bullhorn fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                      <a data-toggle="modal" href="#modalAd"><i class="fa fa-bullhorn fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
                     </div>
-                    <h5 class="stat-info" style="background-color: #FAFAFA">Werbung schalten**</h5>
+                    <h5 class="stat-info" style="background-color: #FAFAFA">Werbung schalten und verwalten**</h5>
                   </div><!-- end stat -->
                 </div><!-- end col-md-2 -->
                 <div class="col-md-2">
@@ -785,6 +785,75 @@ require("db/pdo.inc.php");
               </span>
             </form>
           </div>
+        </div><!-- end modal-content -->
+      </div><!-- end modal-dialog -->
+    </div><!-- end modal -->
+    <!-- Modal ad -->
+    <div class="modal fade" id="modalAd" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h4 class="modal-title">Werbe-Management</h4>
+          </div>
+          <div class="modal-body">
+            <div class="panel-group" id="ad">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#ad" href="#ad1">
+                      Werbung #1
+                    </a>
+                  </h4>
+                </div>
+                <div id="ad1" class="panel-collapse collapse in">
+                  <div class="panel-body">
+                    <form method="post">
+                      <input type="text" class="form-control" maxlength="100" placeholder="Dein Werbetext">
+                      <button type="submit" class="btn btn-default btn-block">Werbung schalten/bearbeiten</button>
+                    </form>
+                  </div><!-- end panel-body -->
+                </div><!-- end panel-collapse -->
+              </div><!-- end panel panel-default -->
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#ad" href="#ad2">
+                      Werbung #2
+                    </a>
+                  </h4>
+                </div>
+                <div id="ad2" class="panel-collapse collapse">
+                  <div class="panel-body">
+                    <form method="post">
+                      <input type="text" class="form-control" maxlength="100" value="Alter Werbetext" readonly="readonly">
+                      <button type="submit" class="btn btn-default btn-block">Werbung reaktivieren</button>
+                    </form>
+                  </div><!-- end panel-body -->
+                </div><!-- end panel-collapse -->
+              </div><!-- end panel panel-default -->
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#ad" href="#ad3">
+                      Werbung #3
+                    </a>
+                  </h4>
+                </div>
+                <div id="ad3" class="panel-collapse collapse">
+                  <div class="panel-body">
+                    <form method="post">
+                      <input type="text" class="form-control" maxlength="100" placeholder="Hier könnte Deine Werbung stehen" readonly="readonly">
+                      <button type="submit" class="btn btn-default btn-block">Werbe-Slot kaufen</button>
+                    </form>
+                  </div><!-- end panel-body -->
+                </div><!-- end panel-collapse -->
+              </div><!-- end panel panel-default -->
+            </div><!-- end panel-group -->
+            <span class="help-block">
+              Das Werbe-AddOn ist erforderlich, um Werbung schalten zu können. Es erlaubt Dir, bis zu 3 Werbungen pro Woche zu schalten, wobei die erste gratis ist. Die 2. und 3. Werbung kostet einmalig jeweils 25 Kadis.<br>
+              Werbungen bleiben für eine Woche aktiv, danach werden diese pausiert. Du kannst diese hier wieder reaktivieren oder einen neuen Werbetext einfügen.
+          </div><!-- end modal-body -->
         </div><!-- end modal-content -->
       </div><!-- end modal-dialog -->
     </div><!-- end modal -->
