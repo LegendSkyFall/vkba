@@ -48,10 +48,16 @@
               <li>
                 <a data-toggle="modal" href="#myModal2">
                   <i class="fa fa-plus fa-fw pull-right"></i>
-                  <span class="badge badge-success pull-right">2</span> Add-Ons</a>
+                  <span class="badge badge-success pull-right">2</span> Add-Ons
+                </a>
                 <a data-toggle="modal" href="#myModal3">
                   <i class="fa fa-users fa-fw pull-right"></i>
-                  <span class="badge badge-danger pull-right">0</span> Kontakte</a>
+                  <span class="badge badge-danger pull-right">0</span> Kontakte
+                </a>
+                <a data-toggle="modal" href="#myModal3">
+                  <i class="fa fa-cog fa-fw pull-right"></i>
+                  VKBA-Einstellungen
+                </a>
               </li>
               <li class="divider"></li>
               <li>
