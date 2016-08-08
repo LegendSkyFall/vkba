@@ -53,7 +53,7 @@ include("include/head.php");
                     echo "<td>" . htmlspecialchars($Transaction['t_sender'], ENT_QUOTES) . "</td>";
                     echo "<td>" . htmlspecialchars($Transaction['t_amount'], ENT_QUOTES) . "</td>";
                     # check type of transaction
-                    switch($Transaction['t_type']){
+                    switch(true){
                       case($Transaction['t_type'] == 0):
                         echo "<td>Privat</td>";
                         break;
@@ -63,7 +63,7 @@ include("include/head.php");
                     }
                     echo "<td>" . htmlspecialchars($Transaction['t_date'], ENT_QUOTES) . "</td>";
                     # check state of Transaction
-                    switch($Transaction['t_state']){
+                    switch(true){
                       case($Transaction['t_state'] == 0):
                         echo "<td class='warning'>Ausstehend</td>";
                         break;
