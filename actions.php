@@ -166,6 +166,145 @@ require("db/pdo.inc.php");
           }
 
         }
+        # handle invoice submit
+        if(isset($_POST["submitInvoice"])){
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]){
+            exit("Illegaler Zugriffsversuch!");
+          }
+          # error handling variable
+          $error = false;
+          # check if receiver submitted
+          if(empty($_POST["invoiceReceiver"])){
+            # no receiver
+            $error = true;
+            $errorMessage = "Du musst einen Empfänger angeben. Möchtest Du die Rechnung keinem Empfänger zuordnen, so muss '77777777' als Kontonummer angegeben werden.";
+          }
+          # check if receiver is a number
+          if(!is_numeric($_POST["invoiceReceiver"])){
+            # unexpected value
+            $error = true;
+            $errorMessage = "Bitte gib eine gültige Kontonummer an. Möchtest Du die Rechnung keinem Empfänger zuordnen, so muss '77777777' als Kontonummer angegeben werden.";
+          }
+          # check if amount submitted
+          if(empty($_POST["invoiceAmount"])){
+            # no amount
+            $error = true;
+            $errorMessage = "Du musst einen Rechnungsbetrag angeben.";
+          }
+          # check if amount is a number
+          if(!is_numeric($_POST["invoiceAmount"])){
+            # unexpected value
+            $error = true;
+            $errorMessage = "Der Rechnungsbetrag muss eine Zahl sein.";
+          }
+          # check if amount too low
+          if($_POST["invoiceAmount"] <= 0){
+            # amouunt too low
+            $error = true;
+            $errorMessage = "Rechnungsbetrag muss größer als 0 Kadis sein.";
+          }
+          # check if amount too high
+          if($_POST["invoiceAmount"] > 9999){
+            # amount too high
+            $error = true;
+            $errorMessage = "Rechnungsbetrag darf nicht größer als 9999 Kadis sein.";
+          }
+          # check if usage submitted
+          if(empty($_POST["invoiceUsage"])){
+            # no usage
+            $error = true;
+            $errorMessage = "Bitte Verwendungszweck angeben.";
+          }
+          # check if usage too long
+          if(strlen($_POST["invoiceUsage"]) > 255){
+            # usage too long
+            $error = true;
+            $errorMessage = "Der Verwendungszweck ist zu lang.";
+          }
+          # check max usages submitted
+          if(empty($_POST["invoiceMaxUsages"])){
+            # no max usages
+            $error = true;
+            $errorMessage = "Du musst ein Begleichungslimit angeben.";
+          }
+          # check if max usages is a number
+          if(!is_numeric($_POST["invoiceMaxUsages"])){
+            # unexpected value
+            $error = true;
+            $errorMessage = "Das Begleichungslimit muss eine Zahl sein.";
+          }
+          # check if max usages not too low
+          if($_POST["invoiceMaxUsages"] <= 0){
+            # max usages too low
+            $error = true;
+            $errorMessage = "Das Begleichungslimit muss größer als 0 sein.";
+          }
+          # check if max usages not too high
+          if($_POST["invoiceMaxUsages"] > 25){
+            # max usages too high
+            $error = true;
+            $errorMessage = "Das Begleichungslimit darf nicht größer als 25 sein.";
+          }
+          # check if receiver exists
+          $checkReceiver = $db->prepare("SELECT ktn_nr FROM Accounts WHERE ktn_nr=:ktn_nr");
+          $checkReceiver->bindValue(":ktn_nr", $_POST["invoiceReceiver"], PDO::PARAM_STR);
+          $checkReceiver->execute();
+          $receiverExists = ($checkReceiver->rowCount() > 0) ? true : false;
+          if(!$receiverExists){
+            # receiver doesn't exist
+            $error = true;
+            $errorMessage = "Der Empfänger existiert nicht. Gib eine gültige Kontonummer an. Möchtest Du die Rechnung keinem Empfänger zuordnen, so muss '77777777' als Kontonummer angegeben werden."
+          }
+          if(!$error){
+            # short url function
+            function createInvoiceURL($url){
+              $ch = curl_init();
+              curl_setopt($ch, CURLOPT_URL, "http://tinyurl.com/api-create.php?url=" . $url);
+              curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+              curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+              $data = curl_exec($ch);
+              curl_close($ch);
+              return $data;
+            }
+            # generate random invoice id and check whether invoice id already exists
+            $randInvoiceID = mt_rand(10000000, 99999999);
+            $checkInvoiceID = $db->prepare("SELECT r_id FROM invoices WHERE r_id=:r_id");
+            $checkInvoiceID->bindValue(":r_id", $randInvoiceID, PDO::PARAM_INT);
+            $checkInvoiceID->execute();
+            $invoiceIDExists = ($checkInvoiceID->rowCount() > 0) ? true : false;
+            foreach($checkInvoiceID as $invoice){
+              $invoiceID = $invoice["r_id"];
+            }
+            if($invoiceIDExists){
+              # generate new random id
+              while($randInvoiceID == $invoiceID){
+                $randInvoiceID = mt_rand(10000000, 99999999);
+                $checkInvoiceID = $db->prepare("SELECT r_id FROM Invoices WHERE r_id=:r_id");
+                $checkInvoiceID->bindValue(":r_id", $randInvoiceID, PDO::PARAM_INT);
+                $checkInvoiceID->execute();
+                foreach($checkInvoiceID as $invoice){
+                  $invoiceID = $invoice["r_id"];
+                }
+              }
+            }
+            # create url
+            $invoiceURL = createInvoiceURL("http://vkba.legendskyfall.de/invoice/?id=" . $randInvoiceID);
+            # create invoice
+            $createInvoice = $db->prepare("INSERT INTO Invoices (r_id, r_user, r_receiver, r_amount, r_info, r_maxUsages) VALUES (:r_id, :r_user, :r_receiver, :r_amount, :r_info, :r_maxUsages)");
+            $createInvoice->bindValue(":r_id", $randInvoiceID, PDO::PARAM_INT);
+            $createInvoice->bindValue(":r_user", $_SESSION["ktn_nr"], PDO::PARAM_INT);
+            $createInvoice->bindValue(":r_receiver", $_POST["invoiceReceiver"], PDO::PARAM_INT);
+            $createInvoice->bindValue(":r_amount", $_POST["invoiceAmount"], PDO::PARAM_STR);
+            $createInvoice->bindValue(":r_info", $_POST["invoiceUsage"], PDO::PARAM_STR);
+            $createInvoice->bindValue(":r_maxUsages", $_POST["invoiceMaxUsages"], PDO::PARAM_INT);
+            $createInvoice->execute();
+            if($createInvoice){
+              # successfull
+              $successMessage = "Rechnung erfolgreich erstellt. Kopiere diesen <a href='$invoiceURL'>Link</a> (rechte Mausklick, Link-Adresse kopieren) und verteile ihn an die gewünschten Personen.";
+            }
+          }
+        }
         # handle code submit
         if(isset($_POST["submitCode"])){
           # CSRF-Protection
@@ -398,7 +537,7 @@ require("db/pdo.inc.php");
                 <div class="col-md-2">
                   <div class="stat">
                     <div class="stat-icon" style="color: #fa8564">
-                      <a data-toggle="modal" href="#myModal-2"><i class="fa fa-pencil-square-o fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                      <a data-toggle="modal" href="#modalInvoice"><i class="fa fa-pencil-square-o fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
                     </div>
                     <h5 class="stat-info" style="background-color: #FAFAFA">Rechnung schreiben</h5>
                   </div><!-- end stat -->
@@ -508,6 +647,42 @@ require("db/pdo.inc.php");
                 Dauerüberweisungen sind Überweisungen, die automatisch in selbst definierten Intervallen an den Empfänger ausgezahlt werden.
                 Abhängig des ausgewählten Typs müssen unter Umständen weitere Informationen angegeben werden.
                 <br>*Die Kontonummer des Empfängers kann unter 'Kontakte', wenn auf den Loginnamen geklickt wird, eingesehen werden.
+              </span>
+            </form>
+          </div>
+        </div><!-- end modal-content -->
+      </div><!-- end modal-dialog -->
+    </div><!-- end modal -->
+    <!-- Modal payout -->
+    <div class="modal fade" id="modalInvoice" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h4 class="modal-title">Rechnungserstellung</h4>
+          </div>
+          <div class="modal-body">
+            Rechnungen sind eine tolle Möglichkeit, um mit anderen bequem zu handeln, die Haus-Miete von Deinem Mitbewohner anzufordern oder für geleistete Arbeit Geld zu verlangen.<br>
+            Das tolle ist - Du erstellst die Rechnung, vordefiniert mit Deinen Angaben und brauchst nur noch den Link an Deine Freunde zu verteilen.<br>
+            Bestätigen sie die Rechnung, wird automatisch der von Dir definierte Betrag abgebucht und Dir gutgeschrieben.<br>
+            Mit nur einem Klick können andere Dir somit für geleistete Arbeit oder für gehandelte Ware Geld überweisen.<br>
+            So einfach - und so viele Möglichkeiten. Und es wird noch besser - Rechnungen können ab sofort auch mehrfach eingelöst werden!
+            <form method="post">
+              <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
+              <label>Empfänger*</label>
+              <input class="form-control" type="number" required="required" placeholder="Kontonummer angeben" name="invoiceReceiver" />
+              <label>Beschreibung/Verwendungszweck</label>
+              <input class="form-control" type="text" required="required" placeholder="Verwendungszweck angeben" name="invoiceUsage" />
+              <label>Rechnungshöhe</label>
+              <input class="form-control" type="number" required="required" min="0.01" max="9999" step="0.01" placeholder="Betrag angeben" name="invoiceAmount" />
+              <label>Begleichungslimit**</label>
+              <input class="form-control" type="number" min="1" max="25" required="required" value="1" placeholder="Wie oft soll die Rechnung insgesamt beglichen werden können?" name="invoiceMaxUsages"/>
+              <button type="submit" class="btn btn-block btn-primary" name="submitInvoice">Rechnung erstellen</button>
+              <span class="help-block">
+                * Als Empfänger muss eine gültige Kontonummer angegeben werden. Die Rechnung ist nur für den angegebenen Spieler gültig. Soll die Rechnung allgemein gültig sein, so trage als Kontonummer "77777777" ein.
+                <br>
+                ** Gibt die Anzahl der maximalen Einlösungen an. Standardmäßig ist eine Rechnung nur einmalig nutzbar. Möchtest Du nun aber bspw. mehrere gleiche Sachen verkaufen, so kannst Du das Begleichungslimit z.B. auf 10 hochsetzen.
+                So kann die Rechnung insgesamt dann 10 mal beglichen werden, bevor diese ungültig wird.
               </span>
             </form>
           </div>
