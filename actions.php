@@ -585,7 +585,7 @@ require("db/pdo.inc.php");
                 <div class="col-md-2">
                   <div class="stat">
                     <div class="stat-icon" style="color: #fa8564">
-                      <a data-toggle="modal" href="#myModal-1"><i class="fa fa-trophy fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                      <a data-toggle="modal" href="#modalTrophies"><i class="fa fa-trophy fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
                     </div>
                     <h5 class="stat-info" style="background-color: #FAFAFA">QuickPoints-Prämien</h5>
                   </div><!-- end stat -->
@@ -593,7 +593,7 @@ require("db/pdo.inc.php");
                 <div class="col-md-2">
                   <div class="stat">
                     <div class="stat-icon" style="color: #fa8564">
-                      <a data-toggle="modal" href="#myModal-1"><i class="fa fa-percent fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                      <a data-toggle="modal" href="#modalPassBook"><i class="fa fa-percent fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
                     </div>
                     <h5 class="stat-info" style="background-color: #FAFAFA">Sparbuch anlegen</h5>
                   </div><!-- end stat -->
@@ -854,6 +854,34 @@ require("db/pdo.inc.php");
               Das Werbe-AddOn ist erforderlich, um Werbung schalten zu können. Es erlaubt Dir, bis zu 3 Werbungen pro Woche zu schalten, wobei die erste gratis ist. Die 2. und 3. Werbung kostet einmalig jeweils 25 Kadis.<br>
               Werbungen bleiben für eine Woche aktiv, danach werden diese pausiert. Du kannst diese hier wieder reaktivieren oder einen neuen Werbetext einfügen.
           </div><!-- end modal-body -->
+        </div><!-- end modal-content -->
+      </div><!-- end modal-dialog -->
+    </div><!-- end modal -->
+    <!-- Modal trophies -->
+    <div class="modal fade" id="modalTrophies" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h4 class="modal-title">QuickPoints-Prämien</h4>
+          </div>
+          <div class="modal-body">
+            Habe noch ein klein wenig Geduld. Wir treffen zurzeit noch einige Vorbereitungen, bevor wir den Prämien-Shop wieder verfügbar machen können.
+          </div>
+        </div><!-- end modal-content -->
+      </div><!-- end modal-dialog -->
+    </div><!-- end modal -->
+    <!-- Modal passBook -->
+    <div class="modal fade" id="modalPassBook" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h4 class="modal-title">Sparbuch</h4>
+          </div>
+          <div class="modal-body">
+            Dieses Feature wird sehr bald freigeschaltet. Wir bitten um ein klein wenig Geduld.
+          </div>
         </div><!-- end modal-content -->
       </div><!-- end modal-dialog -->
     </div><!-- end modal -->
