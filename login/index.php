@@ -10,18 +10,18 @@ if(isset($_POST['submit'])){
 
   # check login credentials
   $getAccountInfo = $db->prepare("SELECT akey, skey, username, pw_hash, salt, activated, a_type, ktn_nr FROM Accounts WHERE username=:username AND banned='0'");
-  $getAccountInfo->bindValue(':username', $_POST['username'], PDO::PARAM_STR);
+  $getAccountInfo->bindValue(":username", $_POST["username"], PDO::PARAM_STR);
   $getAccountInfo->execute();
   $accountExists = ($getAccountInfo->rowCount() > 0) ? true : false;
 
   if($accountExists){
     foreach($getAccountInfo as $accountInfo){
-      $getUsername = $accountInfo['username'];
-      $getPassword = $accountInfo['pw_hash'];
-      $getSaltKey = $accountInfo['salt'];
-      $getActivatedState = $accountInfo['activated'];
-      $getAType = $accountInfo['a_type'];
-      $getKtnNr = $accountInfo['ktn_nr'];
+      $getUsername = $accountInfo["username"];
+      $getPassword = $accountInfo["pw_hash"];
+      $getSaltKey = $accountInfo["salt"];
+      $getActivatedState = $accountInfo["activated"];
+      $getAType = $accountInfo["a_type"];
+      $getKtnNr = $accountInfo["ktn_nr"];
       $getAKey = $accountInfo["akey"];
       $getSKey = $accountInfo["skey"];
     }
@@ -31,13 +31,13 @@ if(isset($_POST['submit'])){
 
   if(!$error){
     # create hash
-    function mySHA512($postedPassword, $getSaltKey, $iterations){
+    function hashPassword($postedPassword, $getSaltKey, $iterations){
       for($x=0; $x<$iterations; $x++){
-        $postedPassword = hash('sha512', $postedPassword . $getSaltKey);
+        $postedPassword = hash("sha512", $postedPassword . $getSaltKey);
       }
       return $postedPassword;
     }
-    $passwordHash = mySHA512($postedPassword, utf8_decode($getSaltKey), 10000);
+    $passwordHash = hashPassword($postedPassword, utf8_decode($getSaltKey), 10000);
 
     if($getPassword != $passwordHash){
       # wrong password
@@ -54,12 +54,14 @@ if(isset($_POST['submit'])){
 
   # if no error, try to login
   if(!$error){
-    if(empty($_SESSION['user'])){
+    if(empty($_SESSION["user"])){
       session_regenerate_id();
-      $_SESSION['user'] = $getUsername;
-      $_SESSION['csrf_token'] = uniqid('',true); # protection against CSRF
-			$_SESSION['ktn_nr'] = $getKtnNr;
-			$_SESSION['ktype'] = $getAType;
+      $_SESSION["user"] = $getUsername;
+      $_SESSION["csrf_token"] = uniqid('',true); # protection against CSRF
+			$_SESSION["ktn_nr"] = $getKtnNr;
+			$_SESSION["ktype"] = $getAType;
+      $_SESSION["akey"] = $getAKey;
+      $_SESSION["skey"] = $getSKey;
       # login successfull
 			header("Location: ../");
     }else{
