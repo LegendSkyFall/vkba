@@ -95,7 +95,7 @@ if(isset($_POST["buyAdvert"])){
     $updateCreatorBalance->bindValue(":username", $qbCreator, PDO::PARAM_STR);
     $updateCreatorBalance->execute();
     # create system message for creator
-    $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 0)");
+    $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 1)");
     $createSysMessage->bindValue(":sys_user", $qbCreator, PDO::PARAM_STR);
     $createSysMessage->bindValue(":message", "Dein QuickBuy Inserat #" . $_POST["qbID"] . " wurde von " . $_SESSION["user"] . " gekauft.", PDO::PARAM_STR);
     $createSysMessage->execute();
