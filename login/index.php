@@ -9,7 +9,7 @@ if(isset($_POST['submit'])){
   $postedPassword= $_POST['password'];
 
   # check login credentials
-  $getAccountInfo = $db->prepare("SELECT username, pw_hash, salt, activated, a_type, ktn_nr FROM Accounts WHERE username=:username AND banned='0'");
+  $getAccountInfo = $db->prepare("SELECT akey, skey, username, pw_hash, salt, activated, a_type, ktn_nr FROM Accounts WHERE username=:username AND banned='0'");
   $getAccountInfo->bindValue(':username', $_POST['username'], PDO::PARAM_STR);
   $getAccountInfo->execute();
   $accountExists = ($getAccountInfo->rowCount() > 0) ? true : false;
@@ -22,6 +22,8 @@ if(isset($_POST['submit'])){
       $getActivatedState = $accountInfo['activated'];
       $getAType = $accountInfo['a_type'];
       $getKtnNr = $accountInfo['ktn_nr'];
+      $getAKey = $accountInfo["akey"];
+      $getSKey = $accountInfo["skey"];
     }
   }else{
     $error = true;

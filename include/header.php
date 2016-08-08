@@ -317,6 +317,28 @@ if(isset($_POST["deleteAddOn"])){
           <?php
           //TODO
           ?>
+          <label>Username</label>
+          <p><?php echo $_SESSION["user"]; ?></p>
+          <label>Kontonummer</label>
+          <p><?php echo $_SESSION["ktn_nr"]; ?></p>
+          <label>Kontotyp</label>
+          <p><?php if($_SESSION["ktype"] == 0){ echo "Girokonto";}else{ echo "Händlerkonto"; } ?></p>
+          <label>SKey (<u>niemals</u> an Dritte weitergeben!)</label>
+          <p><?php echo $_SESSION["skey"]; ?></p>
+          <label>AKey (<u>niemals</u> an Dritte weitergeben!)</label>
+          <p><?php echo $_SESSION["akey"]; ?></p>
+          <label>QuickBuy-Kaufbestätigung</label>
+          <select class="form-control" style="width: 33%">
+            <?php
+            if($quickBuyConfirmation){
+              echo "<option selected value=1>Ja</option>";
+              echo "<option value=0>Nein</option>";
+            }else{
+              echo "<option value=1>Ja</option>";
+              echo "<option selected value=0>Nein</option>";
+            }
+            ?>
+          </select>
         </form>
       </div><!-- end modal-body -->
     </div><!-- end modal-content -->
