@@ -138,11 +138,11 @@ $numTransactions = $getTransactions->rowCount();
 
         if(!empty($errorMessage)){
           # ouput errorMessage
-          echo "<div class='alert alert-danger' style='font-weight: bold; text-align: center'>" . $errorMessage . "</div>";
+          echo "<div class='alert alert-danger' style='font-weight: bold; text-align: center'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $errorMessage . "</div>";
         }
         if(!empty($successMessage)){
           # output successMessage
-          echo "<div class='alert alert-success' style='font-weight: bold; text-align: center'>" . $successMessage . "</div>";
+          echo "<div class='alert alert-success' style='font-weight: bold; text-align: center'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $successMessage . "</div>";
         }
         ?>
         <span id="delMessage"></span> <!-- sysMessage alert will appear here -->
