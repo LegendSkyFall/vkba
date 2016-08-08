@@ -198,6 +198,40 @@ require("db/pdo.inc.php");
             $markAsRedeemed = $db->prepare("UPDATE Code SET redeemed=1 WHERE code=:code");
             $markAsRedeemed->bindValue(":code", $codeNo, PDO::PARAM_STR);
             $markAsRedeemed->execute();
+            # generate random transaction id and check whether transaction id already exists
+            $randTransactionID = mt_rand(100000000, 999999999);
+            $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+            $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+            $checkTransactionID->execute();
+            $transactionIDExists = ($checkTransactionID->rowCount() > 0) ? true : false;
+            foreach($checkTransactionID as $transaction){
+              $transactionID = $transaction["t_id"];
+            }
+            if($transactionIDExists){
+              # generate new random id
+              while($randTransactionID == $transactionID){
+                $randTransactionID = mt_rand(100000000, 999999999);
+                $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+                $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+                $checkTransactionID->execute();
+                foreach($checkTransactionID as $transaction){
+                  $transactionID = $transaction["t_id"];
+                }
+              }
+            }
+            # log transaction
+            $logTransaction = $db->prepare("INSERT INTO Transactions (t_id, t_description, t_adress, t_sender, t_amount, t_type, t_date, t_state) VALUES(:t_id, :t_description, :t_adress, :t_sender, :t_amount, 1, :t_date, 1)");
+            $logTransaction->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+            $logTransaction->bindValue(":t_description", "Guthabenaufladung (Code)", PDO::PARAM_STR);
+            $logTransaction->bindValue(":t_adress", "VKBA-Bot", PDO::PARAM_STR);
+            $logTransaction->bindValue(":t_sender", $_SESSION["user"], PDO::PARAM_STR);
+            $logTransaction->bindValue(":t_amount", $codeValue, PDO::PARAM_STR);
+            $logTransaction->bindValue(":t_date", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+            $logTransaction->execute();
+            if($logTransaction){
+              # successfull
+              $successMessage = "Standardüberweisung erfolgreich ausgeführt.";
+            }
             $successMessage = "Die Aufladung per Code war erfolgreich. Das Geld wurde Dir gutgeschrieben.";
           }else{
             $errorMessage = "Aufladung per Code fehlgeschlagen. Code existiert nicht.";
