@@ -220,7 +220,16 @@ require("db/pdo.inc.php");
           }
           # error handling variable
           $error = false;
-          # //TODO detailed information -> new table for admin interface
+          if(empty($_POST["reportDescription"])){
+            # no description
+            $error = true;
+            $errorMessage = "Bitte teile uns nähere Informationen zu dem Betrugsfall mit.";
+          }
+          if(strlen($_POST["reportDescription"]) > 255){
+            # description too long
+            $error = true;
+            $errorMessage = "Die Beschreibung des Betrugsfall ist zu lang.";
+          }
           $checkTransactionID = $db->prepare("SELECT t_state FROM Transactions WHERE (t_adress=:t_adress OR t_sender=:t_sender) AND t_id =:t_id");
           $checkTransactionID->bindValue(":t_adress", $_SESSION["user"], PDO::PARAM_STR);
           $checkTransactionID->bindValue(":t_sender", $_SESSION["user"], PDO::PARAM_STR);
@@ -241,7 +250,12 @@ require("db/pdo.inc.php");
             }
           }
           if(!$error){
-            # //TODO insert for admin interface with detailed information
+            # log report
+            $logReport = $db->prepare("INSERT INTO adminLog (username, logType, logInfo) VALUES (:username, logType, logInfo)");
+            $logReport->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+            $logReport->bindValue(":logType", "Käuferschutz (#" . $_POST["reportID"] . ")", PDO::PARAM_STR);
+            $logReport->bindValue(":logInfo", $_POST["reportDescription"], PDO::PARAM_STR);
+            $logReport->execute();
             # mark transaction
             $reportTransaction = $db->prepare("UPDATE Transactions SET t_state=2 WHERE t_id=:t_id");
             $reportTransaction->bindValue(":t_id", $_POST["reportID"], PDO::PARAM_INT);
@@ -458,6 +472,8 @@ require("db/pdo.inc.php");
               <br>
               <label>Betroffene Transaktion</label>
               <input type="number" name="reportID" class="form-control" min="100000000" max="999999999" required="required" placeholder="Transaktions-ID angeben"/>
+              <label>Nähere Informationen zum Betrugsfall</label>
+              <textarea class="form-control" maxlength="255" rows="3" name="reportDescription" required="required"></textarea>
               <button type="submit" class="btn btn-block btn-primary" name="submitReport">Käuferschutz beanspruchen</button>
               <span class="help-block">
                 Um den Käuferschutz beanspruchen zu können, ist die Angabe der betroffenen Transaktions-ID notwendig, damit wir den Fall genauer prüfen könnnen.
