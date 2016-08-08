@@ -284,7 +284,7 @@ require("db/pdo.inc.php");
           }
           if(!$error){
             # log report
-            $logReport = $db->prepare("INSERT INTO adminLog (username, logType, logInfo) VALUES (:username, logType, logInfo)");
+            $logReport = $db->prepare("INSERT INTO adminLog (username, logType, logInfo) VALUES (:username, :logType, :logInfo)");
             $logReport->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
             $logReport->bindValue(":logType", "Käuferschutz (#" . $_POST["reportID"] . ")", PDO::PARAM_STR);
             $logReport->bindValue(":logInfo", $_POST["reportDescription"], PDO::PARAM_STR);
@@ -296,6 +296,78 @@ require("db/pdo.inc.php");
             if($reportTransaction){
               # successfull
               $successMessage = "Der Fall wurde gemeldet und nun näher untersucht. Du wirst benachrichtigt, sobald der Fall bearbeitet wurde. Wir hoffen, Du hast weiterhin Spaß bei VKBA und bedanken uns für das Melden.";
+            }
+          }
+        }
+        # handle payout submit
+        if(isset($_POST["submitPayout"])){
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]){
+            exit("Illegaler Zugriffsversuch!");
+          }
+          # get actual balance
+          $getUserBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
+          $getUserBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+          $getUserBalance->execute();
+          foreach($getUserBalance as $balance){
+            $userBalance = $balance["balance"];
+          }
+          if($userBalance <= 0){
+            # not enough money
+            $errorMessage = "Du hast kein Geld, welches Du Dir auszahlen lassen kannst.";
+          }else{
+            # calculate fees
+            if($_SESSION["ktype"] == 0){
+              # giro account, 5% fees
+              $payoutBalance = round($userBalance - (($userBalance/100) * 5), 2);
+            }elseif($_SESSION["ktype"] == 1){
+              # merchant account, 1% fees
+              $payoutBalance = round($userBalance - (($userBalance/100) * 1), 2);
+            }
+            # log transaction
+            # generate random transaction id and check whether transaction id already exists
+            $randTransactionID = mt_rand(100000000, 999999999);
+            $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+            $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+            $checkTransactionID->execute();
+            $transactionIDExists = ($checkTransactionID->rowCount() > 0) ? true : false;
+            foreach($checkTransactionID as $transaction){
+              $transactionID = $transaction["t_id"];
+            }
+            if($transactionIDExists){
+              # generate new random id
+              while($randTransactionID == $transactionID){
+                $randTransactionID = mt_rand(100000000, 999999999);
+                $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+                $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+                $checkTransactionID->execute();
+                foreach($checkTransactionID as $transaction){
+                  $transactionID = $transaction["t_id"];
+                }
+              }
+            }
+            # log transaction
+            $logTransaction = $db->prepare("INSERT INTO Transactions (t_id, t_description, t_adress, t_sender, t_amount, t_type, t_date, t_state) VALUES(:t_id, :t_description, :t_adress, :t_sender, :t_amount, 1, :t_date, 0)");
+            $logTransaction->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+            $logTransaction->bindValue(":t_description", "Auszahlung", PDO::PARAM_STR);
+            $logTransaction->bindValue(":t_adress", $_SESSION["user"], PDO::PARAM_STR);
+            $logTransaction->bindValue(":t_sender", "VKBA-Bot", PDO::PARAM_STR);
+            $logTransaction->bindValue(":t_amount", $payoutBalance, PDO::PARAM_STR);
+            $logTransaction->bindValue(":t_date", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+            $logTransaction->execute();
+            # log payout
+            $logReport = $db->prepare("INSERT INTO adminLog (username, logType, logInfo) VALUES (:username, :logType, :logInfo)");
+            $logReport->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+            $logReport->bindValue(":logType", "Auszahlungsantrag", PDO::PARAM_STR);
+            $logReport->bindValue(":logInfo", $_SESSION["user"] . " - " . $payoutBalance . " Kadis", PDO::PARAM_STR);
+            $logReport->execute();
+            # reset balance
+            $resetBalance = $db->prepare("UPDATE Accounts SET balance=0 WHERE username=:username");
+            $resetBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+            $resetBalance->execute();
+            if($resetBalance){
+              # successfull
+              $successMessage = "Auszahlungsantrag erfolgreich gestellt. Es dauert ca. 1-2 Tage, bis das Geld ingame bei Dir eingetroffen ist. Wir hoffen, Du bleibst uns weiterhin bei VKBA erhalten!";
             }
           }
         }
@@ -358,7 +430,7 @@ require("db/pdo.inc.php");
                 <div class="col-md-2">
                   <div class="stat">
                     <div class="stat-icon" style="color: #fa8564">
-                      <a data-toggle="modal" href="#myModal-1"><i class="fa fa-money fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                      <a data-toggle="modal" href="#modalPayout"><i class="fa fa-money fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
                     </div>
                     <h5 class="stat-info" style="background-color: #FAFAFA">Auszahlung beantragen</h5>
                   </div><!-- end stat -->
@@ -512,6 +584,29 @@ require("db/pdo.inc.php");
                 Um den Käuferschutz beanspruchen zu können, ist die Angabe der betroffenen Transaktions-ID notwendig, damit wir den Fall genauer prüfen könnnen.
                 Die Transaktions-ID ist unter "Transakionen" im Menü auf der rechten Seite aufgelistet.
                 Nach Überprüfung des Falls wirst Du benachrichtigt.
+              </span>
+            </form>
+          </div>
+        </div><!-- end modal-content -->
+      </div><!-- end modal-dialog -->
+    </div><!-- end modal -->
+    <!-- Modal payout -->
+    <div class="modal fade" id="modalPayout" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h4 class="modal-title">Auszahlungsantrag</h4>
+          </div>
+          <div class="modal-body">
+            VKBA ist dazu gedacht, online mit anderen Spielern zu handeln, eine weitere Zahlungsmethode einzuführen, die bequem verwaltbar und von überall aus erreichbar ist.
+            Aus diesem Grund erheben wir für das Auszahlen geringe Gebühren, die abhängig vom Kontotypen, unterschiedlich hoch ausfallen können.<br>
+            Es wird automatisch das <b>gesamte</b> Guthaben, abzüglich der Gebühren, ausgezahlt. Teilauszahlungen sind <b>nicht</b> möglich.
+            <form method="post">
+              <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
+              <button type="submit" class="btn btn-block btn-primary" name="submitPayout">Auszahlung beantragen</button>
+              <span class="help-block">
+                Nach Auszahlungsantrag dauert es etwa 1-2 Tage, bis das Geld ingame überwiesen wurde. Das gesamte Geld wird Dir allerdings sofort abgebucht.
               </span>
             </form>
           </div>
