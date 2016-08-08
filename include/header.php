@@ -315,7 +315,13 @@ if(isset($_POST["deleteAddOn"])){
       <div class="modal-body">
         <form method="post" action="">
           <?php
-          //TODO
+          # get confirmation settings for QuickBuy adverts
+          $getConfirmation = $db->prepare("SELECT qb_confirm FROM Accounts WHERE username=:username");
+          $getConfirmation->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+          $getConfirmation->execute();
+          foreach($getConfirmation as $confirmationState){
+            $quickBuyConfirmation = $confirmationState["qb_confirm"];
+          }
           ?>
           <label>Username</label>
           <p><?php echo $_SESSION["user"]; ?></p>
@@ -339,6 +345,7 @@ if(isset($_POST["deleteAddOn"])){
             }
             ?>
           </select>
+          <button type="submit" class="btn btn-success" name="saveSettings">Einstellungen speichern</button>
         </form>
       </div><!-- end modal-body -->
     </div><!-- end modal-content -->
