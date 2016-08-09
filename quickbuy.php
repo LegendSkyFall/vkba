@@ -308,7 +308,7 @@ include("include/head.php");
           $confirmation = $confirmState["qb_confirm"];
         }
         # fetch available products
-        $getProducts = $db->query("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price FROM QuickBuy WHERE bought=0")->fetchAll();
+        $getProducts = $db->query("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price FROM QuickBuy WHERE bought=0 ORDER BY time_update DESC")->fetchAll();
         foreach($getProducts as $product){
           echo "<form method='post' action='quickbuy.php'>";
             echo "<div class='col-xl-3 col-lg-4 col-md-6' style='max-height: 150px; min-height: 150px; overflow-x: auto; overflow-y: auto'>";
