@@ -350,11 +350,65 @@ $(function() {
         <h4 class="modal-title">Kontakte</h4>
       </div>
       <div class="modal-body">
-        Kontakte werden in naher Zukunft freigeschaltet.
-      </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="input-group">
+              <input type="number" class="form-control" placeholder="Kontonummer angeben">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Als Kontakt speichern</button>
+              </span>
+            </div><!--  end input-group -->
+            <br>
+            <p style="text-align: center; font-style: italic">Spenden für den VKBA-Bot betragen immer 100 Kadis</p>
+          </div><!-- end col-lg-6 -->
+        </div><!-- end row -->
+        <div class="form-group">
+          <div class="user-panel">
+            <div class="pull-left image">
+              <?php
+              $getAvatar = "https://cravatar.eu/avatar/" . "VKBABot";
+              echo "<img src='$getAvatar' class='img-circle' alt='Avatar'/>";
+              ?>
+            </div>
+            <div class="pull-left info" style="color: black">
+              <?php
+              echo "<p>VKBA-Bot</p>";
+              ?>
+              <button type="submit" class="btn btn-danger" name="donate"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Spenden</button>
+            </div>
+          </div><!-- end user-panel -->
+          <hr>
+        </div>
+        <?php
+        $getContacts = $db->prepare("SELECT contact_ktnNr, contact_username FROM Contacts WHERE contact_user=:contact_user");
+        $getContacts->bindValue(":contact_user", $_SESSION["user"], PDO::PARAM_STR);
+        $getContacts->execute();
+        foreach($getContacts as $contact){
+          echo "<div class='form-group'>";
+            echo "<div class='user-panel'>";
+              echo "<div class='pull-left image'>";
+                $getAvatar = "https://cravatar.eu/avatar/" . htmlspecialchars($contact["contact_username"], ENT_QUOTES);
+                echo "<img src='$getAvatar' class='img-circle' alt='Avatar' />";
+              echo "</div>";
+              echo "<div class='pull-left info' style='color: black'>";
+                echo "<p>" . htmlspecialchars($contact["contact_username"], ENT_QUOTES) . "</p>";
+                echo "<button onclick='copyToClipboard(this.innerText)' type='button' class='btn btn-primary'><span class='glyphicon glyphicon-copy' aria-hidden='true'></span> " . htmlspecialchars($contact["contact_ktnNr"], ENT_QUOTES) . "</button>";
+              echo "</div>";
+            echo "</div>";
+            echo "<hr>";
+          echo "</div>";
+        }
+        ?>
+      </div><!-- end modal-body -->
     </div><!-- end modal-content -->
   </div><!-- end modal-dialog -->
 </div><!-- end modal -->
+<script>
+// copy function for contacts
+function copyToClipboard(text) {
+  window.prompt("Zum Kopieren STRG+C, Enter drücken", text);
+}
+</script>
 
 <!-- Modal VKBA settings -->
 <div class="modal fade" id="modalSettings" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
