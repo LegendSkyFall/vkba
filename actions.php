@@ -812,6 +812,7 @@ require("db/pdo.inc.php");
             # show form
             echo "<div class='modal-body'>";
               echo "<div class='panel-group' id='ad'>";
+                # ad 1
                 echo "<div class='panel panel-default'>";
                   echo "<div class='panel-heading'>";
                     echo "<h4 class='panel-title'>";
@@ -820,7 +821,6 @@ require("db/pdo.inc.php");
                       echo "</a>";
                     echo "</h4>";
                   echo "</div>";
-                  # ad 1
                   echo "<div id='ad1' class='panel-collapse collapse in'>";
                     echo "<div class='panel-body'>";
                       echo "<form method='post'>";
@@ -840,7 +840,16 @@ require("db/pdo.inc.php");
                       echo "</form>";
                     echo "</div>";
                   echo "</div>";
-                  # ad 2
+                echo "</div>";
+                # ad 2
+                echo "<div class='panel panel-default'>";
+                  echo "<div class='panel-heading'>";
+                    echo "<h4 class='panel-title'>";
+                      echo "<a data-toggle='collapse' data-parent='#ad' href='#ad2'>";
+                        echo "Werbung #2";
+                      echo "</a>";
+                    echo "</h4>";
+                  echo "</div>";
                   echo "<div id='ad2' class='panel-collapse collapse'>";
                     echo "<div class='panel-body'>";
                       echo "<form method='post'>";
@@ -860,30 +869,39 @@ require("db/pdo.inc.php");
                       echo "</form>";
                     echo "</div>";
                   echo "</div>";
-                  # ad 3
+                echo "</div>";
+                # ad 2
+                echo "<div class='panel panel-default'>";
+                  echo "<div class='panel-heading'>";
+                    echo "<h4 class='panel-title'>";
+                      echo "<a data-toggle='collapse' data-parent='#ad' href='#ad3'>";
+                        echo "Werbung #3";
+                      echo "</a>";
+                    echo "</h4>";
+                  echo "</div>";
                   echo "<div id='ad3' class='panel-collapse collapse'>";
                     echo "<div class='panel-body'>";
                       echo "<form method='post'>";
                         echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
-                        if(!empty($adActive3) && $adActive3 == 1){
-                          echo "<input type='hidden' name='adIDTWO' value='" . $adID3 . "'>";
-                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' value='" . htmlspecialchars($adText3, ENT_QUOTES) . "' name='adTextTHREE'>";
-                          echo "<button type='submit' name='editAdTHREE' class='btn btn-default btn-block'>Werbung schalten/bearbeiten</button>";
-                        }elseif(!empty($adActive3) && $adActive3 == 0){
-                          echo "<input type='hidden' name='adIDTWO' value='" . $adID3 . "'>";
-                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' value='" . htmlspecialchars($adText3, ENT_QUOTES) . "' name='adTextTHREE' readonly='readonly'>";
-                          echo "<button type='submit' name='reactivateAdTHREE' class='btn btn-default btn-block'>Werbung reaktivieren</button>";
+                        if(!empty($adActive2) && $adActive2 == 1){
+                          echo "<input type='hidden' name='adIDTWO' value='" . $adID2 . "'>";
+                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' value='" . htmlspecialchars($adText2, ENT_QUOTES) . "' name='adTextTWO'>";
+                          echo "<button type='submit' name='editAdTWO' class='btn btn-default btn-block'>Werbung bearbeiten</button>";
+                        }elseif(!empty($adActive2) && $adActive2 == 0){
+                          echo "<input type='hidden' name='adIDTWO' value='" . $adID2 . "'>";
+                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' value='" . htmlspecialchars($adText2, ENT_QUOTES) . "' name='adTextTWO' readonly='readonly'>";
+                          echo "<button type='submit' name='reactivateAdTWO' class='btn btn-default btn-block'>Werbung reaktivieren</button>";
                         }else{
-                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' name='adTextTHREE' disabled>";
-                          echo "<button type='submit' name='buyAdTHREE' class='btn btn-default btn-block'>Werbe-Slot kaufen</button>";
+                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' name='adTextTWO' disabled>";
+                          echo "<button type='submit' name='buyAdTWO' class='btn btn-default btn-block'>Werbe-Slot kaufen</button>";
                         }
                       echo "</form>";
                     echo "</div>";
                   echo "</div>";
                 echo "</div>";
               echo "</div>";
-              }
-              ?>
+            }
+            ?>
             <span class="help-block">
               Das Werbe-AddOn ist erforderlich, um Werbung schalten zu können. Es erlaubt Dir, bis zu 3 Werbungen pro Woche zu schalten, wobei die erste gratis ist. Die 2. und 3. Werbung kostet einmalig jeweils 25 Kadis.<br>
               Werbungen bleiben für eine Woche aktiv, danach werden diese pausiert. Du kannst diese hier wieder reaktivieren oder einen neuen Werbetext einfügen.
