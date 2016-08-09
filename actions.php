@@ -805,9 +805,9 @@ require("db/pdo.inc.php");
             $counter = 0;
             foreach($fetchAds as $ad){
               $counter++;
-              ${$adID . $counter} = $ad["ad_id"];
-              ${$adText . $counter} = $ad["adtext"];
-              ${$adActive . $counter} = $ad["ad_active"];
+              ${"adID" . $counter} = $ad["ad_id"];
+              ${"adText" . $counter} = $ad["adtext"];
+              ${"adActive" . $counter} = $ad["ad_active"];
             }
             # show form
             echo "<div class='modal-body'>";
