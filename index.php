@@ -144,7 +144,7 @@ $numTransactions = $getTransactions->rowCount();
           # error handling variable
           $error = false;
           # mark all unread messages as read
-          $updateSysMessages = $db->prepare("UPDATE SysMessage SET has_read=1 WHERE AND sys_user=:sys_user AND has_read=0");
+          $updateSysMessages = $db->prepare("UPDATE SysMessage SET has_read=1 WHERE sys_user=:sys_user AND has_read=0");
           $updateSysMessages->bindValue(":sys_user", $_SESSION["user"], PDO::PARAM_STR);
           $updateSysMessages->execute();
           $sysMessagesUpdated = ($updateSysMessages->rowCount() > 0) ? true : false;
@@ -253,7 +253,7 @@ $numTransactions = $getTransactions->rowCount();
           <section class="panel">
             <header class="panel-heading">
               <form method='post' action='index.php' id='readAllSysMessagesForm'>
-                <input type='hidden' name='token' value='<?php echo htmlspecialchars($systemMessage["id"], ENT_QUOTES) ?>' />
+                <input type='hidden' name='token' value='<?php echo $_SESSION["csrf_token"] ?>' />
                 <button name='readAllSysMessages' type='submit' class='close close-sm'><i class='fa fa-times'></i></button>
               </form>
               Systemmeldungen
