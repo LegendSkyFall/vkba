@@ -883,17 +883,17 @@ require("db/pdo.inc.php");
                     echo "<div class='panel-body'>";
                       echo "<form method='post'>";
                         echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
-                        if(!empty($adActive2) && $adActive2 == 1){
-                          echo "<input type='hidden' name='adIDTWO' value='" . $adID2 . "'>";
-                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' value='" . htmlspecialchars($adText2, ENT_QUOTES) . "' name='adTextTWO'>";
-                          echo "<button type='submit' name='editAdTWO' class='btn btn-default btn-block'>Werbung bearbeiten</button>";
-                        }elseif(!empty($adActive2) && $adActive2 == 0){
-                          echo "<input type='hidden' name='adIDTWO' value='" . $adID2 . "'>";
-                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' value='" . htmlspecialchars($adText2, ENT_QUOTES) . "' name='adTextTWO' readonly='readonly'>";
-                          echo "<button type='submit' name='reactivateAdTWO' class='btn btn-default btn-block'>Werbung reaktivieren</button>";
+                        if(!empty($adActive3) && $adActive3 == 1){
+                          echo "<input type='hidden' name='adIDTHREE' value='" . $adID3 . "'>";
+                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' value='" . htmlspecialchars($adText3, ENT_QUOTES) . "' name='adTextTHREE'>";
+                          echo "<button type='submit' name='editAdTHREE' class='btn btn-default btn-block'>Werbung bearbeiten</button>";
+                        }elseif(!empty($adActive3) && $adActive3 == 0){
+                          echo "<input type='hidden' name='adIDTHREE' value='" . $adID3 . "'>";
+                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' value='" . htmlspecialchars($adText3, ENT_QUOTES) . "' name='adTextTHREE' readonly='readonly'>";
+                          echo "<button type='submit' name='reactivateAdTHREE' class='btn btn-default btn-block'>Werbung reaktivieren</button>";
                         }else{
-                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' name='adTextTWO' disabled>";
-                          echo "<button type='submit' name='buyAdTWO' class='btn btn-default btn-block'>Werbe-Slot kaufen</button>";
+                          echo "<input type='text' class='form-control' maxlength='100' placeholder='Dein Werbetext' name='adTextTHREE' disabled>";
+                          echo "<button type='submit' name='buyAdTHREE' class='btn btn-default btn-block'>Werbe-Slot kaufen</button>";
                         }
                       echo "</form>";
                     echo "</div>";
