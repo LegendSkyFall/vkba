@@ -54,12 +54,13 @@ if(isset($_POST["buyAdvert"])){
       $error = true;
       $errorMessage = "Du kannst nicht Deine eigenen Inserate kaufen.";
     }
-    # fetch users balance
-    $getBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
+    # fetch users balance and QuickPoints
+    $getBalance = $db->prepare("SELECT balance, qp FROM Accounts WHERE username=:username");
     $getBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
     $getBalance->execute();
     foreach($getBalance as $balance){
       $userBalance = $balance["balance"];
+      $userQuickPoints = $balance["qp"];
     }
     # check price
     if($userBalance < $qbPrice){
@@ -84,9 +85,12 @@ if(isset($_POST["buyAdvert"])){
     $buyAdvert->bindValue(":bought_by", $_SESSION["user"], PDO::PARAM_STR);
     $buyAdvert->bindValue(":qb_id", $_POST["qbID"], PDO::PARAM_INT);
     $buyAdvert->execute();
-    # update users balance
-    $updateUserBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+    # calculate QuickPoints
+    $quickPoints = round($qbPrice/10, 0) + $userQuickPoints;
+    # update users balance and QuickPoints
+    $updateUserBalance = $db->prepare("UPDATE Accounts SET balance=:balance, qp=:qp WHERE username=:username");
     $updateUserBalance->bindValue(":balance", $newUserBalance, PDO::PARAM_STR);
+    $updateUserBalance->bindValue(":qp", $quickPoints, PDO::PARAM_INT);
     $updateUserBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
     $updateUserBalance->execute();
     # update creators balance
