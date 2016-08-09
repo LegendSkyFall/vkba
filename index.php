@@ -147,7 +147,7 @@ $numTransactions = $getTransactions->rowCount();
         ?>
         <span id="delMessage"></span> <!-- sysMessage alert will appear here -->
         <div class="alert alert-warning" style="text-align: center; font-weight: bold">
-          VKBA befindet sich derzeit noch in der First-Access-Phase. Fehler könnten noch auftreten!
+          VKBARewrite befindet sich noch in der Entwicklungsphase. Fehler könnten noch auftreten!
         </div>
         <!-- user tiles -->
         <div class="row" style="margin-bottom: 5px">
