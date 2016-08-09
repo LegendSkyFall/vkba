@@ -253,7 +253,7 @@ $numTransactions = $getTransactions->rowCount();
           <section class="panel">
             <header class="panel-heading">
               <form method='post' action='index.php' id='readAllSysMessagesForm'>
-                <input type='hidden' name='token' value='<?php echo $_SESSION["csrf_token"] ?>' />
+                <input type='hidden' name='token' value='<?php echo $_SESSION["csrf_token"]; ?>' />
                 <button name='readAllSysMessages' type='submit' class='close close-sm'><i class='fa fa-times'></i></button>
               </form>
               Systemmeldungen
