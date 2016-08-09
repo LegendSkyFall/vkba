@@ -269,7 +269,7 @@ require("db/pdo.inc.php");
             }
             # generate random invoice id and check whether invoice id already exists
             $randInvoiceID = mt_rand(10000000, 99999999);
-            $checkInvoiceID = $db->prepare("SELECT r_id FROM invoices WHERE r_id=:r_id");
+            $checkInvoiceID = $db->prepare("SELECT r_id FROM Invoices WHERE r_id=:r_id");
             $checkInvoiceID->bindValue(":r_id", $randInvoiceID, PDO::PARAM_INT);
             $checkInvoiceID->execute();
             $invoiceIDExists = ($checkInvoiceID->rowCount() > 0) ? true : false;
