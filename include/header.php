@@ -123,6 +123,119 @@ if(isset($_POST["deleteAddOn"])){
     }
   }
 }
+# handle donation
+if(isset($_POST["donate"])){
+  # CSRF-Protection
+  if($_POST["token"] != $_SESSION["csrf_token"]){
+    exit("Illegaler Zugriffsversuch!");
+  }
+  # get actual balance
+  $getUserBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
+  $getUserBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+  $getUserBalance->execute();
+  foreach($getUserBalance as $balance){
+    $userBalance = $balance["balance"];
+  }
+  # check if user has enough money for donation
+  if($userBalance < 100){
+    $errorMessage = "Du hast leider nicht genügend Geld, um eine kleine Spende in Höhe von 100 Kadis zu hinterlassen.";
+  }else{
+    # calculate new balance
+    $newUserBalance = $userBalance - 100;
+    # update user balance
+    $updateUserBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+    $updateUserBalance->bindValue(":balance", $newUserBalance, PDO::PARAM_STR);
+    $updateUserBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+    $updateUserBalance->execute();
+    # generate random transaction id and check whether transaction id already exists
+    $randTransactionID = mt_rand(100000000, 999999999);
+    $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+    $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+    $checkTransactionID->execute();
+    $transactionIDExists = ($checkTransactionID->rowCount() > 0) ? true : false;
+    foreach($checkTransactionID as $transaction){
+      $transactionID = $transaction["t_id"];
+    }
+    if($transactionIDExists){
+      # generate new random id
+      while($randTransactionID == $transactionID){
+        $randTransactionID = mt_rand(100000000, 999999999);
+        $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+        $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+        $checkTransactionID->execute();
+        foreach($checkTransactionID as $transaction){
+          $transactionID = $transaction["t_id"];
+        }
+      }
+    }
+    # log transaction
+    $logTransaction = $db->prepare("INSERT INTO Transactions (t_id, t_description, t_adress, t_sender, t_amount, t_type, t_date, t_state) VALUES(:t_id, :t_description, :t_adress, :t_sender, :t_amount, 0, :t_date, 1)");
+    $logTransaction->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+    $logTransaction->bindValue(":t_description", "Spende", PDO::PARAM_STR);
+    $logTransaction->bindValue(":t_adress", "VKBA-Bot", PDO::PARAM_STR);
+    $logTransaction->bindValue(":t_sender", $_SESSION["user"], PDO::PARAM_STR);
+    $logTransaction->bindValue(":t_amount", 100, PDO::PARAM_STR);
+    $logTransaction->bindValue(":t_date", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+    $logTransaction->execute();
+    if($logTransaction){
+      # successfull
+      $successMessage = "Vielen Dank für Deine Spende. Der VKBA-Bot arbeitet immer fleißig im Hintergrund, damit alles einwandfrei funktioniert. Jetzt arbeitet er noch motivierter ;)";
+    }
+  }
+}
+# handle add contact
+if(isset($_POST["addContact"])){
+  # CSRF-Protection
+  if($_POST["token"] != $_SESSION["csrf_token"]){
+    exit("Illegaler Zugriffsversuch!");
+  }
+  # error handling variable
+  $error = false;
+  # check if posted ktnNr is an integer
+  if(!filter_var($_POST["contactKtnNr"], FILTER_VALIDATE_INT)){
+    # unexpected value
+    $error = true;
+    $errorMessage = "Die Kontonummer muss eine Zahl sein.";
+  }else{
+    # check if ktnNr exists
+    $checkKtnNr = $db->prepare("SELECT username FROM Accounts WHERE ktn_nr=:ktn_nr");
+    $checkKtnNr->bindValue(":ktn_nr", $_POST["contactKtnNr"], PDO::PARAM_INT);
+    $checkKtnNr->execute();
+    $ktnNrExists = ($checkKtnNr->rowCount() > 0) ? true : false;
+    if(!$ktnNrExists){
+      # ktnNr doesn't exist
+      $error = true;
+      $errorMessage = "Die angegebene Kontonummer ist dem System nicht bekannt.";
+    }else{
+      # get username
+      foreach($checkKtnNr as $ktnNr){
+        $contactUsername = $ktnNr["username"];
+      }
+      if($contactUsername == $_SESSION["user"]){
+        # own
+        $error = true;
+        $errorMessage = "Du kannst Dich nicht selbst als Kontakt einspeichern.";
+      }
+    }
+  }
+  if(!$error){
+    # send info to added contact
+    $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 1)");
+    $createSysMessage->bindValue(":sys_user", $contactUsername, PDO::PARAM_STR);
+    $createSysMessage->bindValue(":message", "Du wurdest von " . $_SESSION["user"] . " als Kontakt hinzugefügt.", PDO::PARAM_STR);
+    $createSysMessage->execute();
+    # insert contact
+    $insertContact = $db->prepare("INSERT INTO Contacts (contact_ktnNr, contact_username, contact_user) VALUES (:contact_ktnNr, :contact_username, :contact_user)");
+    $insertContact->bindValue(":contact_ktnNr", $_POST["contactKtnNr"], PDO::PARAM_INT);
+    $insertContact->bindValue(":contact_username", $contactUsername, PDO::PARAM_STR);
+    $insertContact->bindValue(":contact_user", $_SESSION["user"], PDO::PARAM_STR);
+    $insertContact->execute();
+    if($insertContact){
+      # successfull
+      $successMessage = "Der Kontakt wurde erfolgreich hinzugefügt. Zukünftig kannst Du einfach auf die entsprechende Schaltfläche beim Kontakt betätigen, um die Kontonummer direkt kopieren zu können.";
+    }
+  }
+}
 ?>
 <header class="header">
   <a href="index.php" class="logo">
@@ -352,12 +465,15 @@ $(function() {
       <div class="modal-body">
         <div class="row">
           <div class="col-lg-12">
-            <div class="input-group">
-              <input type="number" class="form-control" placeholder="Kontonummer angeben">
-              <span class="input-group-btn">
-                <button class="btn btn-default" type="button">Als Kontakt speichern</button>
-              </span>
-            </div><!--  end input-group -->
+            <form method="post">
+              <div class="input-group">
+                <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                <input type="number" class="form-control" required="required" min="10000000" max="99999999" name="contactKtnNr"placeholder="Kontonummer">
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="submit" name="addContact">Als Kontakt speichern</button>
+                </span>
+              </div><!--  end input-group -->
+            </form><!-- end form -->
             <br>
             <p style="text-align: center; font-style: italic">Spenden für den VKBA-Bot betragen immer 100 Kadis</p>
           </div><!-- end col-lg-6 -->
@@ -374,7 +490,10 @@ $(function() {
               <?php
               echo "<p>VKBA-Bot</p>";
               ?>
-              <button type="submit" class="btn btn-danger" name="donate"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Spenden</button>
+              <form method="post">
+                <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                <button type="submit" class="btn btn-danger" name="donate"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Spenden</button>
+              </form>
             </div>
           </div><!-- end user-panel -->
           <hr>
