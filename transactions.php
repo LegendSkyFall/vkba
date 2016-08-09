@@ -27,18 +27,28 @@ include("include/head.php");
             <header class="panel-heading">
               Transaktionsübersicht
             </header>
+            <script>
+            $(document).ready(function() {
+              $('#transactionTable').DataTable({
+                ordering: false
+              });
+            });
+            </script>
             <div class="panel-body">
-              <table class="table table-bordered">
-                <tr>
-                  <th>Transaktions-ID</th>
-                  <th>Beschreibung</th>
-                  <th>Empfänger</th>
-                  <th>Absender</th>
-                  <th>Betrag</th>
-                  <th>Typ</th>
-                  <th>Vorgangsdatum</th>
-                  <th>Status</th>
-                </tr>
+              <table class="table table-bordered" id="transactionTable">
+                <thead>
+                  <tr>
+                    <th>Transaktions-ID</th>
+                    <th>Beschreibung</th>
+                    <th>Empfänger</th>
+                    <th>Absender</th>
+                    <th>Betrag</th>
+                    <th>Typ</th>
+                    <th>Vorgangsdatum</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
                 <?php
                 # get transactions and list them
                 $getTransactions = $db->prepare("SELECT t_id, t_description, t_adress, t_sender, t_amount, t_type, t_date, t_state FROM Transactions WHERE t_adress=:adress OR t_sender=:sender ORDER BY t_date DESC");
@@ -80,6 +90,7 @@ include("include/head.php");
                   echo "</tr>";
                 }
                 ?>
+              </tbody>
               </table><!-- end table -->
             </div><!-- end panel-body -->
           </div><!-- end panel -->
