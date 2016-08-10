@@ -47,7 +47,7 @@ if(isset($_POST['submit'])){
     if($getActivatedState == 0){
       # not verified
       $error = true;
-  		$activatedMessage = "Dein Account ist nicht verifiziert! Eine Anleitung gibt es <a href='http://tinyurl.com/vkba-verify'>hier</a>. Bitte anschließend <a href='../verify'>hier</a> Deinen Account aktivieren</a>.";
+  		$activatedMessage = "Dein Account ist nicht verifiziert! Eine Anleitung gibt es <a href='http://tinyurl.com/verify-vkba'>hier</a>. Bitte anschließend <a href='../verify'>hier</a> Deinen Account aktivieren</a>.";
   	}
 
   }
@@ -70,7 +70,7 @@ if(isset($_POST['submit'])){
     }
   }else{
       # login not successfull
-      $errorMessage = "Zugangsdaten falsch oder Account nicht verifiziert (Anleitung gibt es <a href='http://tinyurl.com/vkba-verify'>hier</a>).Bitte erneut versuchen! Unter Umständen kann auch eine Sperrung des Accounts vorliegen.";
+      $errorMessage = "Zugangsdaten falsch oder Account nicht verifiziert (Anleitung gibt es <a href='http://tinyurl.com/verify'>hier</a>).Bitte erneut versuchen! Unter Umständen kann auch eine Sperrung des Accounts vorliegen.";
 	  	session_destroy();
   }
 }
