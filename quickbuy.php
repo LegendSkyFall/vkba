@@ -22,7 +22,7 @@ $countBoughtProducts = $getBoughtProducts->rowCount();
 
 # get and count sold products
 $getSoldProducts = $db->prepare("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price, bought_by FROM QuickBuy WHERE bought=1 AND qb_creator=:user ORDER BY time_update DESC");
-$getSoldProducts->bindValue(":user", $_SESSION["user"]. PDO::PARAM_STR);
+$getSoldProducts->bindValue(":user", $_SESSION["user"], PDO::PARAM_STR);
 $getSoldProducts->execute();
 $countSoldProducts = $getSoldProducts->rowCount();
 
