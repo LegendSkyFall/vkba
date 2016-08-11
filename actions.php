@@ -256,6 +256,12 @@ require("db/pdo.inc.php");
             $error = true;
             $errorMessage = "Der Empfänger existiert nicht. Gib eine gültige Kontonummer an. Möchtest Du die Rechnung keinem Empfänger zuordnen, so muss '77777777' als Kontonummer angegeben werden.";
           }
+          # check if receiver is own user
+          if($_POST["invoiceReceiver"] == $_SESSION["ktn_nr"]){
+            # own
+            $error = true;
+            $errorMessage = "Du darfst Dir selbst keine Rechnungen schreiben.";
+          }
           if(!$error){
             # short url function
             function createInvoiceURL($url){
