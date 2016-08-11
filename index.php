@@ -281,7 +281,9 @@ $numTransactions = $getTransactions->rowCount();
                     }
                       echo "<input type='hidden' name='sysID' value='" . htmlspecialchars($systemMessage["id"], ENT_QUOTES) . "'>";
                       echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
-                      echo "<button name='readSysMessage' type='submit' class='close close-sm'><i class='fa fa-times'></i></button>";
+                      if($systemMessage["sys_type"] != 0){
+                        echo "<button name='readSysMessage' type='submit' class='close close-sm'><i class='fa fa-times'></i></button>";
+                      }
                       echo htmlspecialchars($systemMessage["message"], ENT_QUOTES);
                     echo "</form>";
                   echo "</div>";
