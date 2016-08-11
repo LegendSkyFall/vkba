@@ -15,13 +15,13 @@ $getActiveProducts->execute();
 $countActiveProducts = $getActiveProducts->rowCount();
 
 # get and count bought products
-$getBoughtProducts = $db->prepare("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price FROM QuickBuy WHERE bought=1 AND bought_by=:user ORDER BY time_update DESC");
+$getBoughtProducts = $db->prepare("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price, time_update FROM QuickBuy WHERE bought=1 AND bought_by=:user ORDER BY time_update DESC");
 $getBoughtProducts->bindValue(":user", $_SESSION["user"], PDO::PARAM_STR);
 $getBoughtProducts->execute();
 $countBoughtProducts = $getBoughtProducts->rowCount();
 
 # get and count sold products
-$getSoldProducts = $db->prepare("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price, bought_by FROM QuickBuy WHERE bought=1 AND qb_creator=:user ORDER BY time_update DESC");
+$getSoldProducts = $db->prepare("SELECT qb_id, qb_creator, qb_product, qb_short, qb_price, bought_by, time_update FROM QuickBuy WHERE bought=1 AND qb_creator=:user ORDER BY time_update DESC");
 $getSoldProducts->bindValue(":user", $_SESSION["user"], PDO::PARAM_STR);
 $getSoldProducts->execute();
 $countSoldProducts = $getSoldProducts->rowCount();
@@ -383,6 +383,7 @@ include("include/head.php");
                       echo "<br><b>" . htmlspecialchars($boughtProduct["qb_price"], ENT_QUOTES) . " Kadis</b><br>";
                       echo "<i>QuickBuy-ID: <b>" . htmlspecialchars($boughtProduct["qb_id"], ENT_QUOTES) . "</b></i><br>";
                       echo "Verkäufer: <b>" . htmlspecialchars($boughtProduct["qb_creator"], ENT_QUOTES) . "</b><br>";
+                      echo "Kaufdatum: <b>" .  date("d.m.Y H:i:s", strtotime(htmlspecialchars($boughtProduct["time_update"], ENT_QUOTES))) . "</b>";
                     echo "</div>";
                   echo "</div>";
                 }
@@ -414,7 +415,8 @@ include("include/head.php");
                       echo htmlspecialchars($soldProduct["qb_short"], ENT_QUOTES);
                       echo "<br><b>" . htmlspecialchars($soldProduct["qb_price"], ENT_QUOTES) . " Kadis</b><br>";
                       echo "<i>QuickBuy-ID: <b>" . htmlspecialchars($soldProduct["qb_id"], ENT_QUOTES) . "</b></i><br>";
-                      echo "Gekauft von: <b>" . htmlspecialchars($soldProduct["bought_by"], ENT_QUOTES) . "</b>";
+                      echo "Gekauft von: <b>" . htmlspecialchars($soldProduct["bought_by"], ENT_QUOTES) . "</b><br>";
+                      echo "Verkaufsdatum: <b>" . date("d.m.Y H:i:s", strtotime(htmlspecialchars($soldProduct["time_update"], ENT_QUOTES))) . "</b>";
                     echo "</div>";
                   echo "</div>";
                 }
