@@ -201,6 +201,43 @@ if(isset($_POST["createAdvert"])){
     }
   }
   if(!$error){
+    # special bonus
+    if(date("Y-m-d") == "2016-08-11"){
+      $checkBonus = $db->prepare("SELECT counter FROM BonusCounter WHERE username=:username AND type=0");
+      $checkBonus->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+      $checkBonus->execute();
+      $hasBonus = ($checkBonus->rowCount() > 0) ? true : false;
+      if(!$hasBonus){
+        # insert bonus
+        $insertBonus = $db->prepare("INSERT INTO BonusCounter (username, type, counter) VALUES (:username, 0, 1)");
+        $insertBonus->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+        $insertBonus->execute();
+        # special credit
+        $getBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
+        $getBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+        $getBalance->execute();
+        foreach($getBalance as $balance){
+          # get actual balance
+          $actualBalance = $balance["balance"];
+        }
+        # calculate new balance
+        $newBalance = $actualBalance + 100;
+        # update balance
+        $updateBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+        $updateBalance->bindValue(":balance", $newBalance, PDO::PARAM_STR);
+        $updateBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+        $updateBalance->execute();
+        # create system message for user
+        $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 1)");
+        $createSysMessage->bindValue(":sys_user", $_SESSION["user"], PDO::PARAM_STR);
+        $createSysMessage->bindValue(":message", "Du hast heute einen Bonus gutgeschrieben bekommen, wei Du die Bedingungen für die Bonusaktion erfüllt hast!", PDO::PARAM_STR);
+        $createSysMessage->execute();
+        if($createSysMessage){
+          # successfull
+          $bonusMessage = "Bonusaktion erfüllt! Dir wurden dafür 100 Kadis gutgeschrieben.";
+        }
+      }
+    }
     # generate random quickbuy id and check whether quickbuy id already exists
     $randQuickBuyID = mt_rand(10000000, 99999999);
     $checkQuickBuyID = $db->prepare("SELECT qb_id FROM QuickBuy WHERE qb_id=:qb_id");
@@ -260,6 +297,10 @@ include("include/head.php");
         if(!empty($successMessage)){
           # output successMessage
           echo "<div class='alert alert-success' style='font-weight: bold; text-align: center'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $successMessage . "</div>";
+        }
+        if(!empty($bonusMessage)){
+          # output bonusMessage
+          echo "<div class='alert alert-success' style='font-weight: bold; text-align: center'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $bonusMessage . "</div>";
         }
         ?>
         <!-- row for overview -->
