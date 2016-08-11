@@ -85,7 +85,7 @@ if(isset($_POST['submit'])){
       $saveAccount->bindValue(':atype', $aType, PDO::PARAM_INT);
       $saveAccount->bindValue(':balance', $balance, PDO::PARAM_INT);
       $saveAccount->execute();
-      $success =  "Dein Account wurde erfolgreich erstellt. Zum <a href='../login/'>Login</a>";
+      $success =  "Dein Account wurde erfolgreich erstellt. Bitte <a href='http://tinyurl.com/verify-vkba'>verifiziere </a> nun Deinen Account. Zum <a href='../login/'>Login</a>";
     }
 }
 ?>
