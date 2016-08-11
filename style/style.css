@@ -52,7 +52,7 @@ body > .header {
 /* Define 2 column template */
 .right-side,
 .left-side {
-  min-height: 100%;
+  min-height: calc(100% - 50px);
   display: block;
 }
 /*right side - contins main content*/
