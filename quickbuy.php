@@ -356,6 +356,10 @@ include("include/head.php");
               echo "<div class='sm-st clearfix'>";
                 echo "<input type='hidden' name='qbID' value='" . htmlspecialchars($product["qb_id"], ENT_QUOTES) . "'>";
                 echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES) . "'>";
+                if($product["qb_creator"] == $_SESSION["user"]){
+                  # own product
+                  echo "<button type='submit' name='deleteAdvert' class='btn btn-default btn-sm pull-right'><span style='color: #DC2E31' class='glyphicon glyphicon-remove' aria-hidden='true'></span></button>";
+                }
                 if($confirmation == 0){
                   echo "<button type='submit' name='buyAdvert' class='sm-st-icon st-blue'><i class='fa fa-shopping-cart'></i></button>";
                 }else{
