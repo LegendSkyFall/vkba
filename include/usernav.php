@@ -55,7 +55,7 @@
         }
         ?>
           <a href="transactions.php">
-            <i class="fa fa-eye"></i> <span>Transaktionen</span>
+            <i class="fa fa-table"></i> <span>Transaktionen</span>
           </a>
         </li>
         <?php
@@ -66,7 +66,7 @@
         }
         ?>
           <a href="actions.php">
-            <i class="fa fa-eye"></i> <span>Aktionen</span>
+            <i class="fa fa-plus-square"></i> <span>Aktionen</span>
           </a>
         </li>
         <?php
@@ -77,7 +77,7 @@
         }
         ?>
           <a href="quickbuy.php">
-            <i class="fa fa-eye"></i> <span>QuickBuy</span>
+            <i class="fa fa-shopping-cart"></i> <span>QuickBuy</span>
           </a>
         </li>
         <li>
