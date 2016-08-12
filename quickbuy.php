@@ -275,6 +275,60 @@ if(isset($_POST["createAdvert"])){
     }
   }
 }
+# handle delete request
+if(isset($_POST["deleteAdvert"])){
+  # CSRF-Protection
+  if($_POST["token"] != $_SESSION["csrf_token"]){
+    exit("Illegaler Zugriffsversuch!");
+  }
+  # error handling variable
+  $error = false;
+  # get QuickBuy Advert
+  $getQuickBuyAdvert = $db->prepare("SELECT qb_price FROM QuickBuy WHERE qb_id=:qb_id AND bought=0 AND qb_creator=:qb_creator");
+  $getQuickBuyAdvert->bindValue(":qb_id", $_POST["qbID"], PDO::PARAM_INT);
+  $getQuickBuyAdvert->bindValue(":qb_creator", $_SESSION["user"], PDO::PARAM_STR);
+  $getQuickBuyAdvert->execute();
+  $advertExists = ($getQuickBuyAdvert->rowCount() > 0) ? true : false;
+  if(!$advertExists){
+    # advert doesn't exist or not from user
+    $error = true;
+    $errorMessage = "Das Inserat existiert nicht oder ist nicht von Dir erstellt worden.";
+  }else{
+    foreach($getQuickBuyAdvert as $quickBuyAdvert){
+      $qbPrice = $quickBuyAdvert["qb_price"];
+    }
+    # fetch user balance
+    $getBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
+    $getBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+    $getBalance->execute();
+    foreach($getBalance as $balance){
+      $userBalance = $balance["balance"];
+    }
+    # check price
+    if($userBalance < ($qbPrice * 2)){
+      # not enough money
+      $error = true;
+      $errorMessage = "Du hast nicht genügend Geld, um das Inserat zu löschen. Das Löschen kostet Dich das doppelte vom angegebenem Preis.";
+    }
+  }
+  if(!$error){
+    # calculate new balance
+    $newUserBalance = $userBalance - ($qbPrice * 2);
+    # update balance
+    $updateBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+    $updateBalance->bindValue(":balance", $newUserBalance, PDO::PARAM_STR);
+    $updateBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+    $updateBalance->execute();
+    # delete QuickBuy advert
+    $deleteAdvert = $db->prepare("DELETE FROM QuickBuy WHERE qb_id=:qb_id");
+    $deleteAdvert->bindValue(":qb_id", $_POST["qbID"], PDO::PARAM_INT);
+    $deleteAdvert->execute();
+    if($deleteAdvert){
+      # successfull
+      $successMessage = "Das Inserat wurde erfolgreich gelöscht. Kosten für das Löschen: " . $qbPrice * 2 . " Kadis.";
+    }
+  }
+}
 ?>
 <!DOCTYPE html>
 <html>
