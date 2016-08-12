@@ -264,7 +264,7 @@ if(isset($_POST["createAdvert"])){
     $insertAdvert->bindValue(":qb_creator", $_SESSION["user"], PDO::PARAM_STR);
     $insertAdvert->bindValue(":qb_product", $_POST["productName"], PDO::PARAM_STR);
     $insertAdvert->bindValue(":qb_short", $_POST["productDescription"], PDO::PARAM_STR);
-    $insertAdvert->bindValue(":qb_price", $_POST["productPrice"], PDO::PARAM_STR);
+    $insertAdvert->bindValue(":qb_price", round($_POST["productPrice"], 2), PDO::PARAM_STR);
     $insertAdvert->execute();
     if($insertAdvert){
       # advert creation successfull
