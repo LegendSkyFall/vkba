@@ -260,7 +260,7 @@ $numTransactions = $getTransactions->rowCount();
             </header>
             <div class="panel-box" id="noti-box">
               <?php
-              $getSystemMessages = $db->prepare("SELECT id, message, sys_type FROM SysMessage WHERE (sys_user=:user AND has_read=0) OR sys_user='*' ORDER BY id DESC");
+              $getSystemMessages = $db->prepare("SELECT id, message, sys_type, sys_user FROM SysMessage WHERE (sys_user=:user AND has_read=0) OR sys_user='*' ORDER BY id DESC");
               $getSystemMessages->bindValue(":user", $_SESSION["user"], PDO::PARAM_STR);
               $getSystemMessages->execute();
               $messagesExists = ($getSystemMessages->rowCount() > 0) ? true : false;
@@ -281,7 +281,7 @@ $numTransactions = $getTransactions->rowCount();
                     }
                       echo "<input type='hidden' name='sysID' value='" . htmlspecialchars($systemMessage["id"], ENT_QUOTES) . "'>";
                       echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
-                      if($systemMessage["sys_type"] != 0){
+                      if($systemMessage["sys_user"] != "*"){
                         echo "<button name='readSysMessage' type='submit' class='close close-sm'><i class='fa fa-times'></i></button>";
                       }
                       echo htmlspecialchars($systemMessage["message"], ENT_QUOTES);
