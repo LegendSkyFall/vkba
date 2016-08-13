@@ -211,10 +211,21 @@ if(isset($_POST["addContact"])){
       foreach($checkKtnNr as $ktnNr){
         $contactUsername = $ktnNr["username"];
       }
+      # check if contact to add is own
       if($contactUsername == $_SESSION["user"]){
         # own
         $error = true;
         $errorMessage = "Du kannst Dich nicht selbst als Kontakt einspeichern.";
+      }
+      # check if contact has already been added
+      $checkContact = $db->prepare("SELECT contact_ktnNr FROM Contacts WHERE contact_ktnNr=:contact_ktnNr");
+      $checkContact->bindValue(":contact_ktnNr", $_POST["contactKtnNr"], PDO::PARAM_INT);
+      $checkContact->execute();
+      $contactAlreadyAdded = ($checkContact->rowCount() > 0) ? true : false;
+      if($contactAlreadyAdded){
+        # already added
+        $error = true;
+        $errorMessage = "Du hast diesen Kontakt bereits hinzugefügt.";
       }
     }
   }
