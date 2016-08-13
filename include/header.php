@@ -218,7 +218,8 @@ if(isset($_POST["addContact"])){
         $errorMessage = "Du kannst Dich nicht selbst als Kontakt einspeichern.";
       }
       # check if contact has already been added
-      $checkContact = $db->prepare("SELECT contact_ktnNr FROM Contacts WHERE contact_ktnNr=:contact_ktnNr");
+      $checkContact = $db->prepare("SELECT contact_ktnNr FROM Contacts WHERE contact_user=:contact_user AND contact_ktnNr=:contact_ktnNr");
+      $checkContact->bindValue(":contact_user", $_SESSION["user"], PDO::PARAM_STR);
       $checkContact->bindValue(":contact_ktnNr", $_POST["contactKtnNr"], PDO::PARAM_INT);
       $checkContact->execute();
       $contactAlreadyAdded = ($checkContact->rowCount() > 0) ? true : false;
