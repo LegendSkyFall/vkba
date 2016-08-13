@@ -230,7 +230,7 @@ if(isset($_POST["createAdvert"])){
         # create system message for user
         $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 1)");
         $createSysMessage->bindValue(":sys_user", $_SESSION["user"], PDO::PARAM_STR);
-        $createSysMessage->bindValue(":message", "Du hast heute einen Bonus gutgeschrieben bekommen, wei Du die Bedingungen für die Bonusaktion erfüllt hast!", PDO::PARAM_STR);
+        $createSysMessage->bindValue(":message", "Du hast heute einen Bonus gutgeschrieben bekommen, weil Du die Bedingungen für die Bonusaktion erfüllt hast!", PDO::PARAM_STR);
         $createSysMessage->execute();
         if($createSysMessage){
           # successfull

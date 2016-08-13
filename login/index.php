@@ -62,8 +62,15 @@ if(isset($_POST['submit'])){
 			$_SESSION["ktype"] = $getAType;
       $_SESSION["akey"] = $getAKey;
       $_SESSION["skey"] = $getSKey;
-      # login successfull
-			header("Location: ../");
+      # update last seen
+      $updateLastSeen = $db->prepare("UPDATE Accounts SET last_seen=:last_seen WHERE username=:username");
+      $updateLastSeen->bindValue(":last_seen", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+      $updateLastSeen->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+      $updateLastSeen->execute();
+      if($updateLastSeen){
+        # login successfull
+  			header("Location: ../");  
+      }
     }else{
       # already logged in
       header("Location: ../");

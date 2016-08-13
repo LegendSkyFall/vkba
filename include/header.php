@@ -219,6 +219,43 @@ if(isset($_POST["addContact"])){
     }
   }
   if(!$error){
+    # special bonus
+    if(date("Y-m-d") == "2016-08-13"){
+      $checkBonus = $db->prepare("SELECT counter FROM BonusCounter WHERE username=:username AND type=0");
+      $checkBonus->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+      $checkBonus->execute();
+      $hasBonus = ($checkBonus->rowCount() > 0) ? true : false;
+      if(!$hasBonus){
+        # insert bonus
+        $insertBonus = $db->prepare("INSERT INTO BonusCounter (username, type, counter) VALUES (:username, 1, 1)");
+        $insertBonus->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+        $insertBonus->execute();
+        # special credit
+        $getBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
+        $getBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+        $getBalance->execute();
+        foreach($getBalance as $balance){
+          # get actual balance
+          $actualBalance = $balance["balance"];
+        }
+        # calculate new balance
+        $newBalance = $actualBalance + 250;
+        # update balance
+        $updateBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+        $updateBalance->bindValue(":balance", $newBalance, PDO::PARAM_STR);
+        $updateBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+        $updateBalance->execute();
+        # create system message for user
+        $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 1)");
+        $createSysMessage->bindValue(":sys_user", $_SESSION["user"], PDO::PARAM_STR);
+        $createSysMessage->bindValue(":message", "Du hast heute einen Bonus gutgeschrieben bekommen, weil Du die Bedingungen für die Bonusaktion erfüllt hast!", PDO::PARAM_STR);
+        $createSysMessage->execute();
+        if($createSysMessage){
+          # successfull
+          $bonusMessage = "Bonusaktion erfüllt! Dir wurden dafür 250 Kadis gutgeschrieben.";
+        }
+      }
+    }
     # send info to added contact
     $createSysMessage = $db->prepare("INSERT INTO SysMessage (sys_user, message, sys_type) VALUES (:sys_user, :message, 1)");
     $createSysMessage->bindValue(":sys_user", $contactUsername, PDO::PARAM_STR);
