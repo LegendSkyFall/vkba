@@ -233,7 +233,7 @@ if(isset($_POST["addContact"])){
   if(!$error){
     # special bonus
     if(date("Y-m-d") == "2016-08-13"){
-      $checkBonus = $db->prepare("SELECT counter FROM BonusCounter WHERE username=:username AND type=0");
+      $checkBonus = $db->prepare("SELECT counter FROM BonusCounter WHERE username=:username AND type=1");
       $checkBonus->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
       $checkBonus->execute();
       $hasBonus = ($checkBonus->rowCount() > 0) ? true : false;
