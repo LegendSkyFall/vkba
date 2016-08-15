@@ -1,5 +1,5 @@
 <div class="wrapper row-offcanvas row-offcanvas-left">
-  <aside class="left-side sidebar-offcanvas">
+  <aside style="z-index: 100" class="left-side sidebar-offcanvas">
     <section class="sidebar">
       <div class="user-panel">
         <div class="pull-left image">
