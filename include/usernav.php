@@ -98,7 +98,6 @@
         <h4 class="modal-title">VKBA-Systemstatus</h4>
       </div>
       <div class="modal-body">
-        <div class="alert alert-danger" style="font-weight: bold; text-align: center">Aufgrund von Domainproblemen wird der Status unter Umständen falsch angezeigt.</div>
         <?php
         # get last system states
         $getSystemState = $db->query("SELECT system, api, bot_backend, bot_push FROM SystemState")->fetch();
