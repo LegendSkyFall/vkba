@@ -69,7 +69,7 @@ if(isset($_POST['submit'])){
       $updateLastSeen->execute();
       if($updateLastSeen){
         # login successfull
-  			header("Location: ../");  
+  			header("Location: ../");
       }
     }else{
       # already logged in
@@ -155,5 +155,9 @@ if(isset($_POST['submit'])){
       </div><!-- end modal-body -->
     </div><!-- end modal-content -->
   </div><!-- end modal-dialog -->
+  <div style="text-align: center" class="footer">
+    <a style="padding-right: 5%" href="https://legendskyfall.de/AGB.pdf">AGB</a>
+    <a href="https://legendskyfall.de/impressum">Impressum</a>
+  </div>
 </body>
 </html>
