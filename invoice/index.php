@@ -20,7 +20,7 @@ if(!filter_var($_GET["id"], FILTER_VALIDATE_INT)){
   exit("<div class='alert alert-danger' style='font-weight: bold; text-align: center'>Unerwartete Rechnungs-ID.</div>");
 }
 # get invoice
-$getInvoice = $db->prepare("SELECT r_id, r_user, r_receiver, r_amount, r_info, r_created WHERE r_id=:r_id AND r_used=0");
+$getInvoice = $db->prepare("SELECT r_id, r_user, r_receiver, r_amount, r_info, r_created FROM Invoices WHERE r_id=:r_id AND r_used=0");
 $getInvoice->bindValue(":r_id", $_GET["id"], PDO::PARAM_INT);
 $getInvoice->execute();
 $invoiceExists = ($getInvoice->rowCount() > 0) ? true : false;
@@ -43,7 +43,7 @@ if($rCreated == $_SESSION["user"]){
   exit("<div class='alert alert-danger' style='font-weight: bold; text-align: center'>Du kannst keine eigenen Rechnungen begleichen.</div>");
 }
 # check invoice receiver
-if($rReceiver != $_SESSION["user"] || $rReceiver != "*"){
+if($rReceiver != $_SESSION["user"] && $rReceiver != "77777777"){
   # wrong receiver
   exit("<div class='alert alert-danger' style='font-weight: bold; text-align: center'>Die Rechnung ist nicht für Dich bestimmt.</div>");
 }
@@ -53,8 +53,9 @@ if($rReceiver != $_SESSION["user"] || $rReceiver != "*"){
     Du hast auf einen Rechnungslink geklickt. Bestätige die Rechnung, um sie zu begleichen.
     Hier unten findest Du nähere Angaben zur Rechnung. Überprüfe sie auf ihre Richtigkeit!
   </div>
-  <p style="text-align: center">Rechnungsersteller: <b><?php echo $rCreated; ?></b></p>
+  <p style="text-align: center">Rechnungsersteller-KtnNr.: <b><?php echo $rUser; ?></b></p>
   <p style="text-align: center">Rechnungsbetrag: <b><?php echo $rAmount; ?> Kadis</b></p>
   <p style="text-align: center">Verwendungszweck/Info: <b><?php echo $rInfo; ?></b></p>
+  <p style="text-align: center">Erstelldatum: <b><?php echo date("d.m.Y H:i:s", strtotime($rCreated)); ?></b></p>
   <button type="submit" class="btn btn-block btn-primary">Rechnung begleichen</button>
 </form>
