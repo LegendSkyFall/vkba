@@ -604,6 +604,14 @@ require("db/pdo.inc.php");
                     <h5 class="stat-info" style="background-color: #FAFAFA">Sparbuch anlegen</h5>
                   </div><!-- end stat -->
                 </div><!-- end col-md-2 -->
+                <div class="col-md-2">
+                  <div class="stat">
+                    <div class="stat-icon" style="color: #fa8564">
+                      <a data-toggle="modal" href="#modalLFarm"><i class="fa fa-leaf fa-3x stat-elem" style="background-color: #FAFAFA"></i></a>
+                    </div>
+                    <h5 class="stat-info" style="background-color: #FAFAFA">LFarm</h5>
+                  </div><!-- end stat -->
+                </div><!-- end col-md-2 -->
               </div><!-- end panel-body -->
             </div><!-- end panel -->
           </div><!-- end col-md-12 -->
