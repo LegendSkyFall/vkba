@@ -8,7 +8,7 @@ if(isset($_POST["buyAddOn"])){
   # error handling variable
   $error = false;
   # check if submitted addOnID is valid
-  $availableAddOns = array(1, 2);
+  $availableAddOns = array(1, 2, 3);
   if(!in_array($_POST["addOnID"], $availableAddOns)){
     # unknown addOn
     $error = true;
@@ -34,14 +34,37 @@ if(isset($_POST["buyAddOn"])){
     }
   }
   if(!$error){
-    # buy AddOn
-    $buyAddOn = $db->prepare("INSERT INTO AddOns (add_id, username) VALUES (:add_id, :username)");
-    $buyAddOn->bindValue(":add_id", $_POST["addOnID"], PDO::PARAM_INT);
-    $buyAddOn->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
-    $buyAddOn->execute();
-    if($buyAddOn){
-      # successfull
-      $successMessage = "AddOn-Kauf war erfolgreich. Viel Spaß!";
+    if($_POST["addOnID"] != 3){
+      # buy AddOn
+      $buyAddOn = $db->prepare("INSERT INTO AddOns (add_id, username) VALUES (:add_id, :username)");
+      $buyAddOn->bindValue(":add_id", $_POST["addOnID"], PDO::PARAM_INT);
+      $buyAddOn->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+      $buyAddOn->execute();
+      if($buyAddOn){
+        # successfull
+        $successMessage = "AddOn-Kauf war erfolgreich. Viel Spaß!";
+      }
+    }else{
+      # check request
+      $checkRequest = $db->prepare("SELECT logType FROM adminLog WHERE username=:username AND logType='LFarm-AddOn-Antrag'");
+      $checkRequest->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+      $checkRequest->execute();
+      $alreadyRequested = ($checkRequest->rowCount() > 0) ? true : false;
+      if($alreadyRequested){
+        # already requested
+        $errorMessage = "Du hast bereits einen Antrag gestellt. Bitte warte darauf, dass dieser näher bearbeitet wird.";
+      }else{
+        # send request
+        $sendRequest = $db->prepare("INSERT INTO adminLog (username, logType, logInfo) VALUES (:username, :logType, :logInfo)");
+        $sendRequest->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+        $sendRequest->bindValue(":logType", "LFarm-AddOn-Antrag", PDO::PARAM_STR);
+        $sendRequest->bindValue(":logInfo", $_SESSION["user"] . " beantragt das LFarm-AddOn.", PDO::PARAM_STR);
+        $sendRequest->execute();
+        if($sendRequest){
+          # successfull
+          $successMessage = "Der Antrag für das LFarm-AddOn wurde gestellt. Es wird nun geprüft, ob Du bereits auf der LFarm geaddet bist. Bei erfolgreicher Prüfung kriegst Du das LFarm AddOn zugewiesen.";
+        }
+      }
     }
   }
 }
@@ -54,7 +77,7 @@ if(isset($_POST["deleteAddOn"])){
   # error handling variable
   $error = false;
   # check if submitted addOnID is valid
-  $availableAddOns = array(1, 2);
+  $availableAddOns = array(1, 2, 3);
   if(!in_array($_POST["addOnID"], $availableAddOns)){
     # unknown addOn
     $error = true;
@@ -84,6 +107,8 @@ if(isset($_POST["deleteAddOn"])){
     $terminationFees = (30/100) * 75;
   }elseif($_POST["addOnID"] == 2){
     $terminationFees = (65/100) * 75;
+  }elseif($_POST["addOnID"] == 3){
+    $terminationFees = (5/100) * 75;
   }
   # get actual balance
   $getUserBalance = $db->prepare("SELECT balance FROM Accounts WHERE username=:username");
@@ -461,21 +486,21 @@ $(function() {
             <div class="sm-st clearfix">
               <div class="sm-st-info">
                 <?php
-                # get AddOn1
+                # get AddOn2
                 $addOnTWO = $db->prepare("SELECT id FROM AddOns WHERE username=:username AND add_id=2");
                 $addOnTWO->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
                 $addOnTWO->execute();
                 $hasAddOnTWO = ($addOnTWO->rowCount() > 0) ? true : false;
-                # check if user has AddOn1
+                # check if user has AddOn2
                 if($hasAddOnTWO){
-                  # user has AddOn1
+                  # user has AddOn2
                   echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
                   echo "<input type='hidden' name='addOnID' value=2>";
                   echo "<button type='submit' name='deleteAddOn' class='btn btn-default btn-sm pull-right'>";
                     echo "<span style='color: #DC2E31' class='glyphicon glyphicon-remove' aria-hidden='true'></span>";
                   echo "</button>";
                 }else{
-                  # user has not AddOn1
+                  # user has not AddOn2
                   echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
                   echo "<input type='hidden' name='addOnID' value=2>";
                   echo "<button type='submit' name='buyAddOn' class='btn btn-default btn-sm pull-right'>";
@@ -491,12 +516,49 @@ $(function() {
             </div><!-- end sm-st clearfix -->
           </div><!-- end col-md-12 -->
         </form><!-- end form -->
+        <form method="post" action="">
+          <div class="col-md-12">
+            <div class="sm-st clearfix">
+              <div class="sm-st-info">
+                <?php
+                # get AddOn3
+                $addOnTHREE = $db->prepare("SELECT id FROM AddOns WHERE username=:username AND add_id=3");
+                $addOnTHREE->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+                $addOnTHREE->execute();
+                $hasAddOnTHREE = ($addOnTHREE->rowCount() > 0) ? true : false;
+                # check if user has AddOn3
+                if($hasAddOnTHREE){
+                  # user has AddOn3
+                  echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
+                  echo "<input type='hidden' name='addOnID' value=3>";
+                  echo "<button type='submit' name='deleteAddOn' class='btn btn-default btn-sm pull-right'>";
+                    echo "<span style='color: #DC2E31' class='glyphicon glyphicon-remove' aria-hidden='true'></span>";
+                  echo "</button>";
+                }else{
+                  # user has not AddOn3
+                  echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
+                  echo "<input type='hidden' name='addOnID' value=3>";
+                  echo "<button type='submit' name='buyAddOn' class='btn btn-default btn-sm pull-right'>";
+                    echo "<span style='color: #088A08' class='glyphicon glyphicon-plus' aria-hidden='true'></span>";
+                  echo "</button>";
+                }
+                ?>
+                <span>LFarm-AddOn</span>
+                Dieses AddOn ermöglicht die automatische Gutschrift (unter Aktionen anwählbar) erfarmter Items über die LFarm. Erfordert einen <b>neuen LFarm-Add</b> oder einen einmaligen* Kauf für 1.000 Kadis.
+                <br>
+                <b>Kosten:</b> 5 Kadis/Woche
+              </div><!-- end sm-st-info -->
+            </div><!-- end sm-st clearfix -->
+          </div><!-- end col-md-12 -->
+        </form><!-- end form -->
         <br><br>
         <span class="help-block">
           AddOns können jederzeit gekündigt werden.
           Um Missbrauch zu vermeiden, wird bei der Kündigung ein einmaliger Betrag in Höhe der wöchentlichen Kosten zuzüglich einer kleinen Gebühr in Rechnung gestellt.
           Die wöchentlichen AddOn-Kosten werden - unabhängig vom Kaufdatum - immer sonntags automatisch abgebucht. AddOns können jederzeit wieder gekauft werden.
           Hat der Spieler nicht genügend Geld, die laufenden AddOn-Kosten zu tragen, so wird das AddOn automatisch gekündigt und eine Gebühr in Rechnung gestellt, welche automatisch abgebucht wird.
+          <br>
+          <i>* Spieler, welche ab sofort bei der LFarm geaddet werden, erhalten automatisch das LFarm-AddOn, vorausgesetzt ein VKBA-Konto besteht zum Zeitpunkt des Hinzufügens. Andernfalls muss das AddOn nachträglich gekauft werden.</i>
         </span>
       </div><!-- end modal-body -->
     </div><!-- end modal-content -->
