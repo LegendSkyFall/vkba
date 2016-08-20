@@ -516,6 +516,15 @@ require("db/pdo.inc.php");
             }
           }
         }
+        # handle lfarm submit
+        if(isset($_POST["submitLFarm"])){
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]){
+            exit("Illegaler Zugriffsversuch!");
+          }
+          echo "<meta http-equiv='refresh' content='0; /lfarm'>";
+          exit();
+        }
         # error message
         if(!empty($errorMessage)){
           echo "<div class='alert alert-danger' style='text-align: center; font-weight: bold'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" . $errorMessage . "</div>";
@@ -947,6 +956,29 @@ require("db/pdo.inc.php");
           </div>
           <div class="modal-body">
             Dieses Feature wird sehr bald freigeschaltet. Wir bitten um ein klein wenig Geduld.
+          </div>
+        </div><!-- end modal-content -->
+      </div><!-- end modal-dialog -->
+    </div><!-- end modal -->
+    <!-- Modal lfarm -->
+    <div class="modal fade" id="modalLFarm" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h4 class="modal-title">LFarm</h4>
+          </div>
+          <div class="modal-body">
+            Lasse Dir Deine erfarmten Items von der LFarm direkt und bequem auf Dein VKBA-Konto gutschreiben. Einfach und so schnell wie die automatische Guthabenaufladung.
+            <form method="post">
+              <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
+              <button type="submit" class="btn btn-block btn-primary" name="submitLFarm">Automatisch erfarmte Items gutschreiben</button>
+              <span class="help-block">
+                <b>Du benötigst hierfür das LFarm-AddOn, welches Du nur erhältst, wenn Du jetzt neu geaddet wurdest. Du kannst es auch nachkaufen (s.AddOns)</b><br>
+                Näheres zur LFarm gibt es <a href="http://kshor.de/lfarm2">hier</a>.<br>
+                Bitte warte, wie beim automatischen Guthaben aufladen, vor dem Betätigen einige Minuten, nachdem Du die Items an der VKBA-Ankaufskiste verkauft hast.
+              </span>
+            </form>
           </div>
         </div><!-- end modal-content -->
       </div><!-- end modal-dialog -->
