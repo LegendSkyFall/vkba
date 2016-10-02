@@ -532,7 +532,7 @@ require("db/pdo.inc.php");
             $hasAddOnONE = ($addOnONE->rowCount() > 0) ? true : false;
             if($hasAddOnONE) {
               # check whether an active ad exists
-              $getAd = $db->prepare("SELECT ad_id FROM Ad WHERE username=:usename AND ad_id=:ad_id AND ad_active=1");
+              $getAd = $db->prepare("SELECT ad_id FROM Ad WHERE username=:username AND ad_id=:ad_id AND ad_active=1");
               $getAd->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
               $getAd->bindValue(":ad_id", $_POST["adIDONE"], PDO::PARAM_INT);
               $getAd->execute();
