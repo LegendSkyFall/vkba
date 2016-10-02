@@ -516,6 +516,139 @@ require("db/pdo.inc.php");
             }
           }
         }
+        # handle ad submit
+        # first ad slot
+        if(isset($_POST["editAdONE"])) {
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]) {
+            exit("Illegaler Zugriffsversuch");
+          }
+          # check if field isn't empty or too long
+          if(!empty($_POST["adTextONE"]) || strlen($_POST["adTextONE"]) <= 100) {
+            # check AddOn
+            $addOnONE = $db->prepare("SELECT id FROM AddOns WHERE username=:username AND add_id=1");
+            $addOnONE->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+            $addOnONE->execute();
+            $hasAddOnONE = ($addOnONE->rowCount() > 0) ? true : false;
+            if($hasAddOnONE) {
+              # check whether an active ad exists
+              $getAd = $db->prepare("SELECT ad_id FROM Ad WHERE username=:usename AND ad_id=:ad_id AND ad_active=1");
+              $getAd->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+              $getAd->bindValue(":ad_id", $_POST["adIDONE"], PDO::PARAM_INT);
+              $getAd->execute();
+              $hasActiveAd = ($getAd->rowCount() > 0) ? true : false;
+              if($hasActiveAd) {
+                # update ad text
+                $updateAd = $db->prepare("UPDATE Ad SET adtext=:adtext WHERE ad_id=:ad_id");
+                $updateAd->bindValue(":adtext", $_POST["adTextONE"], PDO::PARAM_STR);
+                $updateAd->bindValue(":ad_id", $_POST["adIDONE"], PDO::PARAM_INT);
+                $updateAd->execute();
+                if($updateAd) {
+                  # successfull
+                  $successMessage = "Werbung erfolgreich editiert";
+                } else {
+                  # something went wrong
+                  $errorMessage = "Editieren der Werbung fehlgeschlagen.";
+                }
+              } else {
+                # invalid or inactive ad
+                $errorMessage = "Ungültige oder nicht aktive Werbung.";
+              }
+            } else {
+              # no AddOn
+              $errorMessage = "Das Werbe-AddOn wird benötigt, um Werbung schalten zu können.";
+            }
+          } else {
+            $errorMessage = "Werbetext darf nicht leer oder länger als 100 Zeichen lang sein.";
+          }
+        } elseif(isset($_POST["reactivateAdONE"])) {
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]) {
+            exit("Illegaler Zugriffsversuch");
+          }
+          # check AddOn
+          $addOnONE = $db->prepare("SELECT id FROM AddOns WHERE username=:username AND add_id=1");
+          $addOnONE->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+          $addOnONE->execute();
+          $hasAddOnONE = ($addOnONE->rowCount() > 0) ? true : false;
+          if($hasAddOnONE) {
+            # check if user has an inactive ad
+            $getInactiveAd = $db->prepare("SELECT ad_id FROM Ad WHERE username=:username AND ad_id=:ad_id AND ad_active=0");
+            $getInactiveAd->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+            $getInactiveAd->bindValue(":ad_id", $_POST["adIDONE"], PDO::PARAM_INT);
+            $getInactiveAd->execute();
+            $hasInactiveAd = ($getInactiveAd->rowCount() > 0) ? true : false;
+            if($hasInactiveAd) {
+              # reactive ad
+              $reactivateAd = $db->prepare("UPDATE Ad SET ad_active=1, ad_date=:ad_date WHERE ad_id=:ad_id");
+              $reactivateAd->bindValue(":ad_date", date("Y-m-d"), PDO::PARAM_STR);
+              $reactivateAd->bindValue(":ad_id", $_POST["adIDONE"], PDO::PARAM_INT);
+              $reactivateAd->execute();
+              if($reactivateAd) {
+                # successfull
+                $successMessage = "Werbung erfolgreich reaktiviert.";
+              } else {
+                # something went wrong
+                $errorMessage = "Reaktivieren der Werbung fehlgeschlagen.";
+              }
+            } else {
+              # invalid or active ad
+              $errorMessage = "Ungültige oder aktive Werbung.";
+            }
+          } else {
+            # no AddOn
+            $errorMessage = "Das Werbe-AddOn wird benötigt, um Werbung schalten zu können.";
+          }
+        } elseif(isset($_POST["insertAdONE"])) {
+          # CSRF-Protection
+          if($_POST["token"] != $_SESSION["csrf_token"]) {
+            exit("Illegaler Zugriffsversuch.");
+          }
+          # check if field isn't empty or too long
+          if(!empty($_POST["adTextONE"]) || strlen($_POST["adTextONE"]) <= 100) {
+            # check AddOn
+            $addOnONE = $db->prepare("SELECT id FROM AddOns WHERE username=:username AND add_id=1");
+            $addOnONE->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+            $addOnONE->execute();
+            $hasAddOnONE = ($addOnONE->rowCount() > 0) ? true : false;
+            if($hasAddOnONE) {
+              # insert ad
+              $insertAd = $db->prepare("INSERT INTO Ad (username, adtext, ad_date) VALUES (:username, :adtext, :ad_date)");
+              $insertAd->bindValue(":username", $_SESSION["username"], PDO::PARAM_STR);
+              $insertAd->bindValue(":adtext", $_POST["adTextONE"], PDO::PARAM_STR);
+              $insertAd->bindValue(":ad_date", date("Y-m-d"), PDO::PARAM_STR);
+              $insertAd->execute();
+              if($insertAd) {
+                # successfull
+                $successMessage = "Werbung erfolgreich eingetragen.";
+              } else {
+                # something went wrong
+                $errorMessage = "Beim Eintragen der Werbung ist ein Fehler aufgetreten.";
+              }
+            } else {
+              # no AddOn
+              $errorMessage = "Das Werbe-AddOn wird benötigt, um Werbung schalten zu können.";
+            }
+          } else {
+            $errorMessage = "Werbetext darf nicht leer oder länger als 100 Zeichen lang sein.";
+          }
+        }
+        # second ad slot
+        if(isset($_POST["editAdTWO"])) {
+          # edit ad two
+        } elseif(isset($_POST["reactivateAdTWO"])) {
+          # reactivate ad two
+        } elseif(isset($_POST["buyAdTWO"])) {
+          # buy ad two
+        }
+        # third ad slot
+        if(isset($_POST["editAdTHREE"])) {
+          # edit ad three
+        } elseif(isset($_POST["reactivateAdTHREE"])) {
+          # reactivate ad three
+        } elseif(isset($_POST["buyAdTHREE"])) {
+          # buy ad three
+        }
         # handle lfarm submit
         if(isset($_POST["submitLFarm"])){
           # CSRF-Protection
