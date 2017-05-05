@@ -296,7 +296,7 @@ $numTransactions = $getTransactions->rowCount();
       </div><!-- main content row -->
     </section><!-- content -->
     <div class="footer-main">
-        &copy; LEGEND-BANK 2016 - Virtual Kadcon Bank Accounts
+        &copy; LEGEND-BANK <?php echo date("Y"); ?> - Virtual Kadcon Bank Accounts
     </div>
     </aside>
   </body>

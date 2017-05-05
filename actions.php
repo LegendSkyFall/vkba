@@ -295,7 +295,7 @@ require("db/pdo.inc.php");
               }
             }
             # create url
-            $invoiceURL = createInvoiceURL("http://vkba.legendskyfall.de/invoice/?id=" . $randInvoiceID);
+            $invoiceURL = createInvoiceURL("https://vkba.legendskyfall.de/invoice/?id=" . $randInvoiceID);
             # create invoice
             $createInvoice = $db->prepare("INSERT INTO Invoices (r_id, r_user, r_receiver, r_amount, r_info, r_maxUsages) VALUES (:r_id, :r_user, :r_receiver, :r_amount, :r_info, :r_maxUsages)");
             $createInvoice->bindValue(":r_id", $randInvoiceID, PDO::PARAM_INT);
@@ -760,7 +760,7 @@ require("db/pdo.inc.php");
         </div><!-- end row -->
       </section><!-- end section -->
       <div class="footer-main">
-          &copy; LEGEND-BANK 2016 - Virtual Kadcon Bank Accounts
+          &copy; LEGEND-BANK <?php echo date("Y"); ?> - Virtual Kadcon Bank Accounts
       </div>
     </aside><!-- end aside -->
     <!-- Modal payment -->
@@ -875,7 +875,7 @@ require("db/pdo.inc.php");
               <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
               <button type="submit" class="btn btn-block btn-primary" name="submitAuto">Automatisch Konto aufladen</button>
               <span class="help-block">
-                Alle VKBA-Akzeptazstellen sind dem Foren-Thread zu entnehmen. Hauptstandort ist der /w Legend auf Server 1.
+                Alle VKBA-Akzeptanzstellen sind dem Foren-Thread zu entnehmen. Hauptstandort ist der /w Legend auf Server 1.
                 Das automatische Aufladen geht frühestens nach 5 Minuten wieder. Das Aufladen ist global, alle offenen Eingänge werden bearbeitet.
                 Nach dem Einzahlen an einem VKBA-Geldautomaten bitte vor Betätigung der Schaltfläche einige Minuten warten.
               </span>
@@ -904,8 +904,8 @@ require("db/pdo.inc.php");
               <textarea class="form-control" maxlength="255" rows="3" name="reportDescription" required="required"></textarea>
               <button type="submit" class="btn btn-block btn-primary" name="submitReport">Käuferschutz beanspruchen</button>
               <span class="help-block">
-                Um den Käuferschutz beanspruchen zu können, ist die Angabe der betroffenen Transaktions-ID notwendig, damit wir den Fall genauer prüfen könnnen.
-                Die Transaktions-ID ist unter "Transakionen" im Menü auf der rechten Seite aufgelistet.
+                Um den Käuferschutz beanspruchen zu können, ist die Angabe der betroffenen Transaktions-ID notwendig, damit wir den Fall genauer prüfen können.
+                Die Transaktions-ID ist unter "Transaktionen" im Menü auf der rechten Seite aufgelistet.
                 Nach Überprüfung des Falls wirst Du benachrichtigt.
               </span>
             </form>
