@@ -97,12 +97,36 @@ require("db/pdo.inc.php");
           }elseif($_POST["paymentSelection"] == 2){
             # date payment
             $paymentSelection = 2;
-            # check date input //TODO
+            # check date input
+            if(!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $_POST["paymentDate"])) {
+                $error = true;
+                $errorMessage = "Ungültiges Datum ausgewählt.";
+            } else {
+                # ensure that date is not in the past
+                if($_POST["paymentDate"] < date("Y-m-d")) {
+                    $error = true;
+                    $errorMessage = "Das Datum der Überweisung darf nicht in der Vergangenheit liegen.";
+                }
+            }
           }elseif($_POST["paymentSelection"] == 3){
             # permanent transfer
             $paymentSelection = 3;
-            # check date input //TODO
-            # check interval //TODO
+            # check date input
+            if(!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $_POST["paymentDate"])) {
+                $error = true;
+                $errorMessage = "Ungültiges Datum ausgewählt.";
+            } else {
+                # ensure that date is not in the past
+                if($_POST["paymentDate"] < date("Y-m-d")) {
+                    $error = true;
+                    $errorMessage = "Das Startdatum bei der Dauerüberweisung darf nicht in der Vergangenheit liegen.";
+                }
+            }
+            # check interval
+            if(!$_POST["paymentInterval"] >= 0 && !$_POST["paymentInterval"] <= 30) {
+                $error = true;
+                $errorMessage = "Bitte wähle ein Intervall zwischen 1 und 30 Tagen aus.";
+            }
           }else{
             # invalid payment selection
             $error = true;
@@ -160,8 +184,61 @@ require("db/pdo.inc.php");
                 # successfull
                 $successMessage = "Standardüberweisung erfolgreich ausgeführt.";
               }
-            }else{
-              $errorMessage = "Derzeit ist nur die Standardüberweisung aktiviert.";
+          } else if($paymentSelection == 2) {
+              # update users balance
+              $updateUserBalance = $db->prepare("UPDATE Accounts SET balance=:balance WHERE username=:username");
+              $updateUserBalance->bindValue(":balance", $newUserBalance, PDO::PARAM_STR);
+              $updateUserBalance->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+              $updateUserBalance->execute();
+              if($updateUserBalance) {
+                  # generate random transaction id and check whether transaction id already exists
+                  $randTransactionID = mt_rand(100000000, 999999999);
+                  $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+                  $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+                  $checkTransactionID->execute();
+                  $transactionIDExists = ($checkTransactionID->rowCount() > 0) ? true : false;
+                  foreach($checkTransactionID as $transaction){
+                    $transactionID = $transaction["t_id"];
+                  }
+                  if($transactionIDExists){
+                    # generate new random id
+                    while($randTransactionID == $transactionID){
+                      $randTransactionID = mt_rand(100000000, 999999999);
+                      $checkTransactionID = $db->prepare("SELECT t_id FROM Transactions WHERE t_id=:t_id");
+                      $checkTransactionID->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+                      $checkTransactionID->execute();
+                      foreach($checkTransactionID as $transaction){
+                        $transactionID = $transaction["t_id"];
+                      }
+                    }
+                  }
+                  # log transaction
+                  $logTransaction = $db->prepare("INSERT INTO Transactions (t_id, t_description, t_adress, t_sender, t_amount, t_type, t_date, t_state) VALUES(:t_id, :t_description, :t_adress, :t_sender, :t_amount, 0, :t_date, 0)");
+                  $logTransaction->bindValue(":t_id", $randTransactionID, PDO::PARAM_INT);
+                  $logTransaction->bindValue(":t_description", "Terminüberweisung", PDO::PARAM_STR);
+                  $logTransaction->bindValue(":t_adress", $receiverUsername, PDO::PARAM_STR);
+                  $logTransaction->bindValue(":t_sender", $_SESSION["user"], PDO::PARAM_STR);
+                  $logTransaction->bindValue(":t_amount", round($_POST["amount"], 2), PDO::PARAM_STR);
+                  $logTransaction->bindValue(":t_date", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+                  $logTransaction->execute();
+                  if($logTransaction){
+                    # successfull
+                    $successMessage = "Terminüberweisung erfolgreich eingegangen. Das Geld wurde Deinem Konto bereits abgebucht, der Empfänger erhlält das Geld am eingestellten Datum.";
+                } else $errorMessage = "Fehler beim Eintragen der Terminüberweisung.";
+              } else $errorMessage = "Fehler beim Aktualisieren des Kontostands aufgetreten.";
+          } else if($paymentSelection == 3){
+              # insert permanent transfer
+              $insertPermanentTransfer = $db->prepare("INSERT INTO PermanentTransfer (username, to_username, amount, description, start_date, next_exec, t_interval) VALUES (:username, :receiver, :amount, :description, :start, :next, :interval)");
+              $insertPermanentTransfer->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+              $insertPermanentTransfer->bindValue(":receiver", $receiverUsername, PDO::PARAM_STR);
+              $insertPermanentTransfer->bindValue(":amount", round($_POST["amount"], 2), PDO::PARAM_STR);
+              $insertPermanentTransfer->bindValue(":description", $_POST["usage"], PDO::PARAM_STR);
+              $insertPermanentTransfer->bindValue(":start", $_POST["paymentDate"], PDO::PARAM_STR);
+              $insertPermanentTransfer->bindValue(":next", date('Y-m-d', strtotime($_POST["paymentDate"]. ' + ' + round($_POST["paymentInterval"]) + ' days')), PDO::PARAM_STR);
+              $insertPermanentTransfer->bindValue(":interval", round($_POST["paymentInterval"]), PDO::PARAM_INT);
+              $insertPermanentTransfer->execute();
+              if($insertPermanentTransfer) $successMessage = "Dauerüberweisung erfolgreich eingetragen.";
+              else $errorMessage = "Fehler beim Eintragen der Dauerüberweisung aufgetreten."
             }
           }
 
