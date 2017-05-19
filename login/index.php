@@ -25,6 +25,12 @@ if(isset($_POST['submit'])){
       $getAKey = $accountInfo["akey"];
       $getSKey = $accountInfo["skey"];
     }
+    # check if player blacklisted
+    $checkBlacklist = $db->prepare("SELECT username FROM blacklist WHERE username=:username");
+    $checkBlacklist->bindValue(":username", $getUsername, PDO::PARAM_STR);
+    $checkBlacklist->execute();
+    $isBlacklisted = (($checkBlacklist->rowCount() === 1)? true : false);
+    if($isBlacklisted) $error = true;
   }else{
     $error = true;
   }

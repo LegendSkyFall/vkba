@@ -58,6 +58,16 @@ if(isset($_POST['submit'])){
       }
     }
 
+    if(!$error) {
+        # check if player blacklisted
+        $checkBlacklist = $db->prepare("SELECT username FROM blacklist WHERE username=:username");
+        $checkBlacklist->bindValue(":username", $username, PDO::PARAM_STR);
+        $checkBlacklist->execute();
+        $isBlacklisted = (($checkBlacklist->rowCount() === 1)? true : false);
+        if($isBlacklisted) $error = true;
+        $errorMessage .= "Bei diesem Account liegt eine Sperrung vor.<br>";
+    }
+
     # if no error, create account
     if(!$error){
       # generate password hash
