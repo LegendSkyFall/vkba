@@ -666,9 +666,9 @@ function copyToClipboard(text) {
           <label>Kontotyp</label>
           <p><?php if($_SESSION["ktype"] == 0){ echo "Girokonto";}else{ echo "Händlerkonto"; } ?></p>
           <label>SKey (<u>niemals</u> an Dritte weitergeben!)</label>
-          <p><?php echo $_SESSION["skey"]; ?></p>
+          <p onclick="$(this).text(<?php echo $_SESSION["skey"]; ?>)"><u>Anzeigen</u></p>
           <label>AKey (<u>niemals</u> an Dritte weitergeben!)</label>
-          <p><?php echo $_SESSION["akey"]; ?></p>
+          <p onclick="$(this).text(<?php echo $_SESSION["akey"]; ?>)"><u>Anzeigen</u></p>
           <label>QuickBuy-Kaufbestätigung</label>
           <select class="form-control" style="width: 33%">
             <?php
