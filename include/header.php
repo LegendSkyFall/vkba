@@ -408,11 +408,27 @@ if(isset($_POST["addContact"])){
               <li>
                 <a data-toggle="modal" href="#modalAddOn">
                   <i class="fa fa-plus fa-fw pull-right"></i>
-                  <span class="badge badge-success pull-right">2</span> Add-Ons
+                    <span class="badge badge-success pull-right">
+                        <?php
+                        $getAddOnsCount = $db->prepare("SELECT COUNT(*) FROM vkba.AddOns WHERE username=:username");
+                        $getAddOnsCount->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+                        $getAddOnsCount->execute();
+                        $addOnCount = $getAddOnsCount->fetch();
+                        echo $addOnCount["COUNT(*)"];
+                        ?>
+                    </span> Add-Ons
                 </a>
                 <a data-toggle="modal" href="#modalContacts">
                   <i class="fa fa-users fa-fw pull-right"></i>
-                  <span class="badge badge-danger pull-right">0</span> Kontakte
+                    <span class="badge badge-danger pull-right">
+                        <?php
+                        $getContactsCount = $db->prepare("SELECT COUNT(*) FROM vkba.Contacts WHERE contact_user=:contact_user");
+                        $getContactsCount->bindValue(":contact_user", $_SESSION["user"], PDO::PARAM_STR);
+                        $getContactsCount->execute();
+                        $contactCount = $getContactsCount->fetch();
+                        echo $contactCount["COUNT(*)"];
+                        ?>
+                    </span> Kontakte
                 </a>
                 <a data-toggle="modal" href="#modalSettings">
                   <i class="fa fa-cog fa-fw pull-right"></i>
