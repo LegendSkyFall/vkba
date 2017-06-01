@@ -1,4 +1,51 @@
 <?php
+# handle saveSettings
+if(isset($_POST["saveSettings"])) {
+    # CSRF-Protection
+    if($_POST["token"] != $_SESSION["csrf_token"]){
+      exit("Illegaler Zugriffsversuch!");
+    }
+    # handle qbConfirmation
+    if(isset($_POST["qbConfirmation"])) {
+        $updateQbConfirmation = $db->prepare("UPDATE vkba.Accounts SET qb_confirm=:qb_confirm WHERE username=:username");
+        $updateQbConfirmation->bindValue(":qb_confirm", (($_POST["qbConfirmation"] == 1)? 1 : 0), PDO::PARAM_INT);
+        $updateQbConfirmation->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+        $updateQbConfirmation->execute();
+        if(!$updateQbConfirmation) $errorMessage = "Fehler beim Ändern der Quickbuy-Bestätigung aufgetreten.";
+        else $successMessage = "Ändern der Quickbuy-Bestätigung war erfolgreich.";
+    }
+    # handle password change
+    if(isset($_POST["newPassword"]) && strlen($_POST["newPassword"]) > 0 && isset($_POST["newPassword2"])) {
+        # check equality
+        if($_POST["newPassword"] == $_POST["newPassword2"]) {
+            # check length
+            if(strlen($_POST["newPassword"]) >= 6) {
+                # get salt
+                $getSalt = $db->prepare("SELECT salt FROM vkba.Accounts WHERE username=:username");
+                $getSalt->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+                $getSalt->execute();
+                $saltInfo = $getSalt->fetch();
+
+                # hash password and update
+                function hashPassword($postedPassword, $getSaltKey, $iterations){
+                  for($x=0; $x<$iterations; $x++){
+                    $postedPassword = hash("sha512", $postedPassword . $getSaltKey);
+                  }
+                  return $postedPassword;
+                }
+
+                $passwordHash = hashPassword($_POST["newPassword"], utf8_decode($saltInfo["salt"]), 10000);
+
+                $updatePassword = $db->prepare("UPDATE vkba.Accounts SET pw_hash=:pw_hash WHERE username=:username");
+                $updatePassword->bindValue(":pw_hash", $passwordHash, PDO::PARAM_STR);
+                $updatePassword->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
+                $updatePassword->execute();
+                if($updatePassword) $successMessage = "Das Passwort wurde erfolgreich geändert.";
+                else $errorMessage = "Fehler beim Ändern des Passworts aufgetreten.";
+            } else $errorMessage = "Das Passwort muss aus mindestens 6 Zeichen bestehen.";
+        } else $errorMessage = "Die Passwörter sind nicht identisch";
+    }
+}
 # handle buyAddOn
 if(isset($_POST["buyAddOn"])){
   # CSRF-Protection
@@ -651,6 +698,7 @@ function copyToClipboard(text) {
       <div class="modal-body">
         <form method="post" action="">
           <?php
+          echo "<input type='hidden' name='token' value='" . $_SESSION["csrf_token"] . "'>";
           # get confirmation settings for QuickBuy adverts
           $getConfirmation = $db->prepare("SELECT qb_confirm FROM Accounts WHERE username=:username");
           $getConfirmation->bindValue(":username", $_SESSION["user"], PDO::PARAM_STR);
@@ -665,12 +713,16 @@ function copyToClipboard(text) {
           <p><?php echo $_SESSION["ktn_nr"]; ?></p>
           <label>Kontotyp</label>
           <p><?php if($_SESSION["ktype"] == 0){ echo "Girokonto";}else{ echo "Händlerkonto"; } ?></p>
+          <label>Passwort ändern</label>
+          <input type="password" class="form-control" min="6" name="newPassword">
+          <label>Passwort wiederholen</label>
+          <input type="password" class="form-control" min="6" name="newPassword2">
           <label>SKey (<u>niemals</u> an Dritte weitergeben!)</label>
           <p onclick="$(this).text(<?php echo $_SESSION["skey"]; ?>)"><u>Anzeigen</u></p>
           <label>AKey (<u>niemals</u> an Dritte weitergeben!)</label>
           <p onclick="$(this).text(<?php echo $_SESSION["akey"]; ?>)"><u>Anzeigen</u></p>
           <label>QuickBuy-Kaufbestätigung</label>
-          <select class="form-control" style="width: 33%">
+          <select class="form-control" style="width: 33%" name="qbConfirmation">
             <?php
             if($quickBuyConfirmation){
               echo "<option selected value=1>Ja</option>";
