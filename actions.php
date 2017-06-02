@@ -14,6 +14,32 @@ require("db/pdo.inc.php");
   <?php
   include('include/head.php');
   ?>
+  <script type="text/javascript">
+  function togglePaymentFields(selectObj) {
+      var selection = parseInt(selectObj.value),
+          paymentDate = $('#paymentDate'),
+          dateLabel = $('#paymentDateLabel'),
+          paymentInterval = $('#paymentInterval'),
+          intervalLabel = $('#paymentIntervalLabel');
+
+      if(selection === 1) {
+          paymentDate.hide();
+          dateLabel.hide();
+          paymentInterval.hide();
+          intervalLabel.hide();
+      } else if(selection === 2) {
+          paymentDate.show();
+          dateLabel.show();
+          paymentInterval.hide();
+          intervalLabel.hide();
+      } else if(selection === 3) {
+          paymentDate.show();
+          dateLabel.show();
+          paymentInterval.show();
+          intervalLabel.show();
+      }
+  }
+  </script>
   <body class="skin-black">
     <?php
     include('include/header.php');
@@ -123,7 +149,7 @@ require("db/pdo.inc.php");
                 }
             }
             # check interval
-            if(!$_POST["paymentInterval"] >= 0 && !$_POST["paymentInterval"] <= 30) {
+            if($_POST["paymentInterval"] < 0 || $_POST["paymentInterval"] > 30) {
                 $error = true;
                 $errorMessage = "Bitte wähle ein Intervall zwischen 1 und 30 Tagen aus.";
             }
@@ -219,11 +245,11 @@ require("db/pdo.inc.php");
                   $logTransaction->bindValue(":t_adress", $receiverUsername, PDO::PARAM_STR);
                   $logTransaction->bindValue(":t_sender", $_SESSION["user"], PDO::PARAM_STR);
                   $logTransaction->bindValue(":t_amount", round($_POST["amount"], 2), PDO::PARAM_STR);
-                  $logTransaction->bindValue(":t_date", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+                  $logTransaction->bindValue(":t_date", $_POST["paymentDate"], PDO::PARAM_STR);
                   $logTransaction->execute();
                   if($logTransaction){
                     # successfull
-                    $successMessage = "Terminüberweisung erfolgreich eingegangen. Das Geld wurde Deinem Konto bereits abgebucht, der Empfänger erhlält das Geld am eingestellten Datum.";
+                    $successMessage = "Terminüberweisung erfolgreich eingegangen. Das Geld wurde Deinem Konto bereits abgebucht, der Empfänger erhält das Geld am eingestellten Datum.";
                 } else $errorMessage = "Fehler beim Eintragen der Terminüberweisung.";
               } else $errorMessage = "Fehler beim Aktualisieren des Kontostands aufgetreten.";
           } else if($paymentSelection == 3){
@@ -238,7 +264,7 @@ require("db/pdo.inc.php");
               $insertPermanentTransfer->bindValue(":interval", round($_POST["paymentInterval"]), PDO::PARAM_INT);
               $insertPermanentTransfer->execute();
               if($insertPermanentTransfer) $successMessage = "Dauerüberweisung erfolgreich eingetragen.";
-              else $errorMessage = "Fehler beim Eintragen der Dauerüberweisung aufgetreten."
+              else $errorMessage = "Fehler beim Eintragen der Dauerüberweisung aufgetreten.";
             }
           }
 
@@ -858,11 +884,15 @@ require("db/pdo.inc.php");
               <label>Betrag</label>
               <input type="number" class="form-control" placeholder="Betrag angeben" name="amount" required="required" min="0.01" max="9999" step="0.01"/>
               <label>Überweisungsvariante wählen</label>
-              <select class="form-control" id="paymentSelection" name="paymentSelection">
+              <select class="form-control" id="paymentSelection" name="paymentSelection" onchange="togglePaymentFields(this)">
                 <option value="1">Standardüberweisung</option>
                 <option value="2">Terminüberweisung</option>
                 <option value="3">Dauerüberweisung</option>
               </select>
+              <label id="paymentDateLabel" style="display: none">(Start-)Datum</label>
+              <input class="form-control" type="date" name="paymentDate" id="paymentDate" style="display: none">
+              <label id="paymentIntervalLabel" style="display: none">Intervall</label>
+              <input class="form-control" type="number" name="paymentInterval" id="paymentInterval" min="1" max="30" style="display: none">
               <input type="hidden" name="token" value="<?php echo $_SESSION['csrf_token']; ?>">
               <br>
               <button type="submit" class="btn btn-block btn-primary" name="submitPayment">Überweisung tätigen</button>
