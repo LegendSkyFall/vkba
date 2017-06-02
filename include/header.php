@@ -375,26 +375,42 @@ if(isset($_POST["addContact"])){
         <li class="dropdown messages-menu">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
             <i class="fa fa-inbox"></i>
-            <span class="label label-primary">0</span>
+            <?php
+            $getUnreadTransactions = $db->prepare("SELECT * FROM vkba.Transactions WHERE t_adress=:t_adress AND has_read=0 ORDER BY t_date DESC");
+            $getUnreadTransactions->bindValue(":t_adress", $_SESSION["user"], PDO::PARAM_STR);
+            $getUnreadTransactions->execute();
+            echo "<span class='label label-primary' style='width: 20px'>" . $getUnreadTransactions->rowCount() . "</span>";
+            ?>
           </a>
           <ul class="dropdown-menu">
-            <li class="header">0 neue Transaktionen</li>
+              <?php
+              echo "<li class='header'>" . $getUnreadTransactions->rowCount() . " neue Transaktionen</li>";
+              ?>
               <li>
                 <!-- will contain unread transactions in the future -->
                 <ul class="menu">
                   <li>
-                    <a href="#">
-                      <div class="pull-left">
-                        <img src="" class="img-circle" alt="user image" />
-                      </div>
-                      <h4>Benutzer</h4>
-                      <p>Derzeit noch nicht verfügbar.</p>
-                      <small class="pull-right"><i class="fa fa-clock-o"></i> 00:00</small>
-                    </a>
+                      <?php
+                      $tmpCnt = 0;
+                      foreach ($getUnreadTransactions as $unreadTransaction) {
+                          if($tmpCnt++ < 5) {
+                              echo "<a href='transactions.php'>";
+                                echo "<div class='pull-left'>";
+                                    echo "<img src='https://cravatar.eu/avatar/" . htmlspecialchars($unreadTransaction["t_sender"], ENT_QUOTES) . "' class='img-circle' alt='user image'>";
+                                echo "</div>";
+                                echo "<h4>" . htmlspecialchars($unreadTransaction["t_sender"], ENT_QUOTES) . "</h4>";
+                                echo "<p>" . htmlspecialchars($unreadTransaction["t_description"], ENT_QUOTES) . "</p>";
+                                echo "<small class='pull-left'><i class='fa fa-money'></i> " . $unreadTransaction["t_amount"] . "</small>";
+                                echo "<small class='pull-right'><i class='fa fa-clock-o'></i> " . date("d.m.Y H:i:s", strtotime($unreadTransaction["t_date"])) . "</small>";
+                              echo "</a>";
+                          }
+                      }
+                      unset($tmpCnt);
+                      ?>
                   </li>
                 </ul><!-- end menu -->
               </li>
-              <li class="footer"><a href="#">Alle Transaktionen einsehen</a></li>
+              <li class="footer"><a href="transactions.php">Alle Transaktionen einsehen</a></li>
             </ul><!-- end dropdown-menu -->
           </li><!-- end dropdown messages-menu -->
           <!-- user account menu -->
